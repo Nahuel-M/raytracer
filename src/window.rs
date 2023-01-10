@@ -2,14 +2,6 @@ use gfx_device_gl::{Factory, Resources, CommandBuffer};
 use image::RgbaImage;
 use piston_window::{TextureContext, clear, Event};
 
-extern crate sdl2;
-
-use sdl2::event::Event;
-use sdl2::keyboard::Keycode;
-use sdl2::pixels;
-
-use sdl2::gfx::primitives::DrawRenderer;
-
 pub struct Window{
     window : piston_window::PistonWindow,
     texture_context: TextureContext<Factory, Resources, CommandBuffer>

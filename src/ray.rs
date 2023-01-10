@@ -8,6 +8,6 @@ pub struct Ray {
 
 impl Ray{
     pub fn at(&self, distance : f64) -> Vector3<f64>{
-        self.direction_unit*distance
+        self.origin + self.direction_unit*distance
     }
 }
