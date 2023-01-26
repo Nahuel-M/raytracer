@@ -1,5 +1,5 @@
 use nalgebra::Vector3;
-use crate::{ray::Ray, renderer::RayRenderable};
+use crate::{ray::Ray, renderer::Hittable};
 
 pub struct Mandelbulb{}
 
@@ -33,7 +33,7 @@ impl Mandelbulb{
     }
 }
 
-impl RayRenderable for Mandelbulb{
+impl Hittable for Mandelbulb{
     fn get_hit_distance(&self, ray: &Ray) -> Option<f64> {
         let mut point = ray.origin + ray.direction_unit;
         let mut distance = 0.0;

@@ -3,17 +3,21 @@ name = "raytracer"
 version = "0.1.0"
 edition = "2021"
 
-[profile.release]
-debug = 1
+[profile.dev]
+debug = 2
 incremental = true
+
+[profile.release]
+debug = 0
+incremental = true
+
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 image = "0.24.5"
-piston_window = "0.127.0"
-piston-float = "1.0.0"
-nalgebra = "0.31.4"
-gfx_device_gl = "0.16.2"
 regex = "1.7.0"
 show-image = { version = "0.13.1", features = ["image"]}
+rayon = "1.6.1"
+fastrand = "1.8.0"
+float-ord = "0.3.2"
