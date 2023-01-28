@@ -1,18 +1,18 @@
 
-use crate::shape::{model::Model, polygon::Polygon};
+use crate::shape::{model::Model, triangle::Triangle};
 
 use regex::Regex;
 
 #[allow(dead_code)]
 pub fn parse_ascii_stl(input: &str) -> Result<Model, String> {
-    let mut polygons = Vec::<Polygon>::new();
+    let mut polygons = Vec::<Triangle>::new();
     let regex = Regex::new(
         r"facet normal\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*outer loop\s*vertex\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*vertex\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*vertex\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*endloop\s*endfacet",
     )
     .unwrap();
 
     for capture in regex.captures_iter(input) {
-        polygons.push(Polygon::with_normal(
+        polygons.push(Triangle::with_normal(
             (
                 str::parse::<f64>(&capture[4]).unwrap(),
                 str::parse::<f64>(&capture[5]).unwrap(),
@@ -42,14 +42,14 @@ pub fn parse_ascii_stl(input: &str) -> Result<Model, String> {
 
 #[allow(dead_code)]
 pub fn parse_ascii_stl_no_normals(input: &str) -> Result<Model, String> {
-    let mut polygons = Vec::<Polygon>::new();
+    let mut polygons = Vec::<Triangle>::new();
     let regex = Regex::new(
         r"facet normal\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*outer loop\s*vertex\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*vertex\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*vertex\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*endloop\s*endfacet",
     )
     .unwrap();
 
     for capture in regex.captures_iter(input) {
-        polygons.push(Polygon::new( 
+        polygons.push(Triangle::new( 
             (
                 str::parse::<f64>(&capture[4]).unwrap(),
                 str::parse::<f64>(&capture[5]).unwrap(),

@@ -1,4 +1,6 @@
 use std::ops::{Div, Mul};
+use std::fmt::Display;
+
 
 use crate::Vec3;
 #[derive(Clone, Copy, Debug)]
@@ -46,15 +48,27 @@ impl Quaternion {
     }
 }
 
+impl Display for Quaternion{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "[{}, {}, {}, {}]", self.real, self.i, self.j, self.k)
+    }
+}
+
+impl Default for Quaternion {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl From<Vec3> for Quaternion{
     fn from(value: Vec3) -> Self {
         Quaternion { real: 0., i: value.x, j: value.y, k: value.z }
     }
 }
 
-impl Into<Vec3> for Quaternion{
-    fn into(self) -> Vec3 {
-        Vec3{x: self.i, y: self.j, z: self.k}
+impl From<Quaternion> for Vec3{
+    fn from(val: Quaternion) -> Self {
+        Vec3{x: val.i, y: val.j, z: val.k}
     }
 }
 

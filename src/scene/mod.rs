@@ -8,7 +8,7 @@ use image::{ImageBuffer, Pixel, Rgba};
 use camera::Camera;
 use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 
-use crate::{ray::Ray, shape::{sphere::Sphere, polygon::Polygon}};
+use crate::{ray::Ray, shape::{sphere::Sphere, triangle::Triangle}};
 
 const MAX_DEPTH: u8 = 4;
 
@@ -22,6 +22,7 @@ pub struct Scene<'a> {
 
 impl Display for Scene<'_>{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "{}", self.camera).unwrap();
         for object in &self.objects{
             writeln!(f, "{}", object).unwrap();
         }
@@ -47,7 +48,7 @@ impl<'a> Scene<'a> {
     pub fn add_sphere<>(&mut self, sphere : Sphere){
         self.objects.push(Hittable::with_sphere(sphere));
     }
-    pub fn add_polygon<>(&mut self, polygon : Polygon){
+    pub fn add_polygon<>(&mut self, polygon : Triangle){
         self.objects.push(Hittable::with_polygon(polygon));
     }
 
@@ -57,6 +58,13 @@ impl<'a> Scene<'a> {
 
     pub fn render(&mut self, super_samples: usize){
         let now = std::time::Instant::now();
+        
+        print!("Pre-computing... ");
+        for hittable in &mut self.objects{
+            hittable.shape.pre_compute();
+        }
+        println!(" Done in {} seconds", now.elapsed().as_secs());
+
         print!("Rendering... ");
         let half_width: f64 = self.image.width() as f64 / 2.;
         let half_height: f64 = self.image.height() as f64 / 2.;

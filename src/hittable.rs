@@ -4,7 +4,7 @@ use std::fmt::Display;
 use crate::{
     material::Material,
     ray::Ray,
-    shape::{polygon::Polygon, sphere::Sphere, Shape, model::Model},
+    shape::{triangle::Triangle, sphere::Sphere, Shape, model::Model},
     Vec3, hit::Hit,
 };
 pub struct Hittable<'a> {
@@ -42,7 +42,7 @@ impl Hittable<'_> {
             material: Material::new(Vec3::new(1., 1., 1.)),
         }
     }
-    pub fn with_polygon(polygon: Polygon) -> Self {
+    pub fn with_polygon(polygon: Triangle) -> Self {
         Hittable {
             shape: Box::new(polygon),
             material: Material::new(Vec3::new(1., 1., 1.)),

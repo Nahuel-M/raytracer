@@ -13,13 +13,17 @@ use crate::Vec3;
 use super::Shape;
 
 #[derive(Debug)]
-pub struct Polygon {
+pub struct Triangle {
     pub vertices: [Vec3; 3],
     pub normal: Vec3,
     pub parallel_to_surface: Vec3,
+    edge_1: Vec3,
+    edge_2: Vec3,
+    v_1: Vec3,
+    v_2: Vec3
 }
 #[allow(dead_code)]
-impl Polygon {
+impl Triangle {
     pub fn new_triangle_looking_at_position(
         triangle_position: Vec3,
         looking_position: Vec3,
@@ -48,10 +52,14 @@ impl Polygon {
         let normal =
             -Vec3::cross(&(vertices[1] - vertices[0]), &(vertices[2] - vertices[0])).normalize();
         let parallel_to_surface = (vertices[0] - vertices[1]).normalize();
-        Polygon {
+        Triangle {
             vertices,
             normal,
             parallel_to_surface,
+            edge_1: Vec3::zeros(),
+            edge_2: Vec3::zeros(),
+            v_1: Vec3::zeros(),
+            v_2: Vec3::zeros(),
         }
     }
     pub fn new(p1: (f64, f64, f64), p2: (f64, f64, f64), p3: (f64, f64, f64)) -> Self {
@@ -61,10 +69,14 @@ impl Polygon {
             Vec3::new(p3.0, p3.1, p3.2),
         ];
 
-        Polygon {
+        Triangle {
             vertices: points,
             normal: -Vec3::cross(&(points[1] - points[0]), &(points[2] - points[0])).normalize(),
             parallel_to_surface: (points[0] - points[1]).normalize(),
+            edge_1: Vec3::zeros(),
+            edge_2: Vec3::zeros(),
+            v_1: Vec3::zeros(),
+            v_2: Vec3::zeros(),
         }
     }
 
@@ -80,10 +92,14 @@ impl Polygon {
             Vec3::new(p3.0, p3.1, p3.2),
         ];
 
-        Polygon {
+        Triangle {
             vertices: points,
             normal: Vec3::new(normal.0, normal.1, normal.2),
             parallel_to_surface: (points[0] - points[1]).normalize(),
+            edge_1: Vec3::zeros(),
+            edge_2: Vec3::zeros(),
+            v_1: Vec3::zeros(),
+            v_2: Vec3::zeros(),
         }
     }
     #[allow(dead_code)]
@@ -92,27 +108,26 @@ impl Polygon {
         let vec2 = self.vertices[2] - self.vertices[0];
         vec1.cross(&vec2).normalize()
     }
+
+    #[allow(clippy::manual_range_contains)]
     pub fn get_hit_distance(&self, ray: &Ray) -> Option<f64> {
-        let distance_to_plane = self.normal.dot(&(self.vertices[0] - ray.origin))
-            / self.normal.dot(&ray.direction_unit);
-        let point_on_plane = ray.at(distance_to_plane);
-        let directions = [
-            self.vertices[1] - self.vertices[0],
-            self.vertices[2] - self.vertices[1],
-            self.vertices[0] - self.vertices[2],
-        ];
-        if directions
-            .iter()
-            .zip(self.vertices.to_vec())
-            .any(|(direction, vertex)| {
-                (point_on_plane - vertex).cross(direction).dot(&self.normal) < 0.0
-            })
-            // .all_equal()
-        {
+        let distance_to_plane = self.normal.dot(&(self.vertices[0] - ray.origin))   // 5+, 3*
+            / self.normal.dot(&ray.direction_unit);                                 // 2+, 3*, 1/
+        let point_on_plane = ray.at(distance_to_plane);                             // 3+, 3*
+
+        let a = 1. - (self.vertices[1] - point_on_plane).dot(&self.v_1) / self.edge_1.dot(&self.v_1);      // 7+, 6*, 1/
+        if a > 1. || a < 0.{
             return None;
         }
+
+        let b = 1. - (self.vertices[2] - point_on_plane).dot(&self.v_2) / self.edge_2.dot(&self.v_2);       // 7+, 6*, 1/
+        if b > 1. || b < 0. || a + b > 1. {
+            return None;
+        }
+
         Some(distance_to_plane)
     }
+
     pub fn bounding_points(&self) -> [Vec3; 2]{
         [
             Vec3::new(self.vertices[0].x.min(self.vertices[1].x).min(self.vertices[2].x),
@@ -125,13 +140,13 @@ impl Polygon {
     }
 }
 
-impl Display for Polygon{
+impl Display for Triangle{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", "Polygon with normal: ".to_string() + self.normal.to_string().as_str())
     }
 }
 
-impl Shape for Polygon{
+impl Shape for Triangle{
     fn get_potential_hit(&self, ray: &crate::ray::Ray) -> Option<Hit> {
         let potential_hit = self.get_hit_distance(ray);
 
@@ -145,15 +160,23 @@ impl Shape for Polygon{
         }
         None
     }
+    
+    fn pre_compute(&mut self){
+        self.edge_1 = self.vertices[1] - self.vertices[0];
+        self.edge_2 = self.vertices[2] - self.vertices[0];
+
+        self.v_1 = self.edge_1 - self.edge_1.project(&self.edge_2);  
+        self.v_2 = self.edge_2 - self.edge_2.project(&self.edge_1);    
+    }
 }
 
-impl MulAssign<f64> for Polygon{
+impl MulAssign<f64> for Triangle{
     fn mul_assign(&mut self, rhs: f64) {
         self.vertices.iter_mut().for_each(|vertex| *vertex *= rhs);
     }
 }
 
-impl AddAssign<Vec3> for Polygon{
+impl AddAssign<Vec3> for Triangle{
     fn add_assign(&mut self, rhs: Vec3) {
         self.vertices.iter_mut().for_each(|vertex| *vertex += rhs);
     }

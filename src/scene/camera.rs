@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::{
     algebra::{quaternion::Quaternion},
     ray::Ray,
@@ -30,8 +32,8 @@ impl Camera {
     }
     pub fn ray_for_pixel(&self, x: f64, y: f64) -> Ray {
         let mut pixel_normal =
-            Vec3::new(x * self.pixel_size, -y * self.pixel_size, -1f64).normalize();
-        // self.rotation_quaternion.rotate_vector(&mut pixel_normal);
+            Vec3::new(x * self.pixel_size, -y * self.pixel_size, 1f64).normalize();
+        self.rotation_quaternion.rotate_vector(&mut pixel_normal);
         Ray {
             origin: self.position,
             direction_unit: pixel_normal,
@@ -40,5 +42,11 @@ impl Camera {
     pub fn look_at(&mut self, position: Vec3) {
         self.rotation_quaternion =
             Quaternion::from_unit_vectors(Vec3::z(), (position - self.position).normalize());
+    }
+}
+
+impl Display for Camera{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Camera at {} with orientation quaternion {}", self.position, self.rotation_quaternion)
     }
 }

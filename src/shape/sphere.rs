@@ -85,6 +85,7 @@ impl Shape for Sphere{
         }
         None
     }
+    fn pre_compute(&mut self){}
 }
 
 #[cfg(test)]

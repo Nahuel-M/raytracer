@@ -13,6 +13,10 @@ impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Vec3 { x, y, z }
     }
+
+    pub fn zeros() -> Self{
+        Vec3::new(0., 0., 0.,)
+    }
     pub fn dot(&self, other: &Vec3) -> f64 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
@@ -22,6 +26,14 @@ impl Vec3 {
             y: self.z * other.x - self.x * other.z,
             z: self.x * other.y - self.y * other.x,
         }
+    }
+
+    pub fn project(&self, onto : &Vec3) -> Vec3{
+        *onto * self.dot(onto) / onto.dot(onto)
+    }
+
+    pub fn project_onto_unit_vector(&self, onto : Vec3) -> Vec3{
+        onto * self.dot(&onto)
     }
 
     pub fn magnitude(&self) -> f64 {
@@ -41,11 +53,7 @@ impl Vec3 {
     }
 
     pub fn z() -> Vec3 {
-        Vec3 {
-            x: 0.,
-            y: 0.,
-            z: 1.,
-        }
+        Vec3 {x: 0., y: 0., z: 1. }
     }
     pub fn min(&self) -> f64{
         self.x.min(self.y).min(self.z)

@@ -2,15 +2,15 @@ use std::{ops::{AddAssign, MulAssign}, fmt::Display};
 
 use crate::{algebra::vec3::Vec3, hit::Hit, ray::Ray};
 
-use super::{polygon::Polygon, cuboid::Cuboid, Shape};
+use super::{triangle::{Triangle, self}, cuboid::Cuboid, Shape};
 #[derive(Debug)]
 pub struct Model {
-    pub polygons: Vec<Polygon>,
+    pub polygons: Vec<Triangle>,
     pub bounding_box: Cuboid
 }
 
 impl Model {
-    pub fn new(polygons: Vec<Polygon>) -> Self {
+    pub fn new(polygons: Vec<Triangle>) -> Self {
         let bounding_points = polygons
             .iter()
             .map(|polygon| polygon.bounding_points())
@@ -60,6 +60,11 @@ impl Shape for Model{
             });
         }
         None
+    }
+    fn pre_compute(&mut self){
+        for polygon in &mut  self.polygons{
+            polygon.pre_compute();
+        }
     }
 }
 impl MulAssign<f64> for Model {
