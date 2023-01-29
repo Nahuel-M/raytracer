@@ -1,10 +1,10 @@
 
-use crate::shape::{model::Model, triangle::Triangle};
+use crate::shape::{mesh::Mesh, triangle::Triangle};
 
 use regex::Regex;
 
 #[allow(dead_code)]
-pub fn parse_ascii_stl(input: &str) -> Result<Model, String> {
+pub fn parse_ascii_stl(input: &str) -> Result<Mesh, String> {
     let mut polygons = Vec::<Triangle>::new();
     let regex = Regex::new(
         r"facet normal\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*outer loop\s*vertex\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*vertex\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*vertex\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*endloop\s*endfacet",
@@ -29,19 +29,19 @@ pub fn parse_ascii_stl(input: &str) -> Result<Model, String> {
                 str::parse::<f64>(&capture[12]).unwrap(),
             ),
             (
-                -str::parse::<f64>(&capture[1]).unwrap(),
-                -str::parse::<f64>(&capture[2]).unwrap(),
-                -str::parse::<f64>(&capture[3]).unwrap(),
+                str::parse::<f64>(&capture[1]).unwrap(),
+                str::parse::<f64>(&capture[2]).unwrap(),
+                str::parse::<f64>(&capture[3]).unwrap(),
             ),
         ));
     }
 
-    Ok(Model::new(polygons))
+    Ok(Mesh::new(polygons))
 }
 
 
 #[allow(dead_code)]
-pub fn parse_ascii_stl_no_normals(input: &str) -> Result<Model, String> {
+pub fn parse_ascii_stl_no_normals(input: &str) -> Result<Mesh, String> {
     let mut polygons = Vec::<Triangle>::new();
     let regex = Regex::new(
         r"facet normal\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*outer loop\s*vertex\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*vertex\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*vertex\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*([\w\+\-\.]+)\s*endloop\s*endfacet",
@@ -68,5 +68,5 @@ pub fn parse_ascii_stl_no_normals(input: &str) -> Result<Model, String> {
         ));
     }
 
-    Ok(Model::new(polygons))
+    Ok(Mesh::new(polygons))
 }

@@ -3,9 +3,8 @@ use std::fmt::Display;
 
 use crate::{
     material::Material,
-    ray::Ray,
-    shape::{triangle::Triangle, sphere::Sphere, Shape, model::Model},
-    Vec3, hit::Hit,
+    shape::{triangle::Triangle, sphere::Sphere, Shape, mesh::Mesh},
+    Vec3, hit::Hit, ray::Ray,
 };
 pub struct Hittable<'a> {
     pub shape: Box<dyn Shape + 'a>,
@@ -22,14 +21,14 @@ impl fmt::Debug for Hittable<'_> {
         write!(f, "{}", self)
     }
 }
-impl From<Model> for Hittable<'_>{
-    fn from(value: Model) -> Self {
+impl<'a> From<Mesh> for Hittable<'a>{
+    fn from(value: Mesh) -> Self {
         Hittable{ shape: Box::new(value), material: Material::base_diffuse() }
     }
 }
 
 #[allow(dead_code)]
-impl Hittable<'_> {
+impl<'a> Hittable<'a> {
     pub fn sphere() -> Self {
         Hittable {
             shape: Box::new(Sphere::new(0, 0, 0, 1)),
@@ -68,7 +67,34 @@ impl Hittable<'_> {
         self.material.ior = ior.into();
         self
     }
-    pub fn get_potential_hit(&self, ray : &Ray) -> Option<Hit>{
-        self.shape.get_potential_hit(ray)
+
+    // pub fn propagate_ray(&self, ray: &Ray, hit: Hit, world : &World, remaining_depth : u8) -> Vec3{
+    //     let mut final_color = Vec3::new(0., 0., 0.);
+        
+    //     final_color += self.material.luminance;
+    //     if self.material.specular > 0.001 {
+    //         final_color += self.material.specular * {
+    //             let specular_ray = ray.reflect_specular(hit.normal, hit.position);
+    //             Scene::color_for_ray(&specular_ray, world, remaining_depth - 1)
+    //         };
+    //     }
+    //     if self.material.specular + self.material.refraction < 0.999 && self.material.color.sum() > 0.001 {
+    //         final_color += (1. - self.material.specular - self.material.refraction) * self.material.color * {
+    //             let diffuse_ray = ray.reflect_diffuse(hit.normal, hit.parallel_to_surface, hit.position);
+    //             Scene::color_for_ray(&diffuse_ray, world, remaining_depth - 1)
+    //         };
+    //     }
+    //     if self.material.refraction > 0.001 {
+    //         final_color += self.material.refraction * {
+    //             let refract_ray = ray.refract(hit.normal, hit.position, self.material.ior);
+    //             Scene::color_for_ray(&refract_ray, world, remaining_depth - 1)
+    //         };
+    //     }
+    //     final_color
+    // }
+
+    pub(crate) fn get_hit(&self, ray: &Ray) -> Option<Hit> {
+        self.shape.get_hit(ray)
     }
+
 }

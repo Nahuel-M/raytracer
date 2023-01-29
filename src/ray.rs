@@ -2,7 +2,7 @@ use std::f64::consts::PI;
 
 use crate::Vec3;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Ray {
     pub origin: Vec3,
     pub direction_unit: Vec3,

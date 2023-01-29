@@ -1,5 +1,5 @@
 use crate::algebra::vec3::Vec3;
-
+#[derive(Debug)]
 pub struct Hit {
     pub distance: f64,
     pub position: Vec3,

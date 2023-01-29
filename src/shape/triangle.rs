@@ -1,14 +1,14 @@
-
 use std::f64::consts::PI;
 use std::fmt::Display;
-use std::ops::{MulAssign, AddAssign};
+use std::ops::{AddAssign, MulAssign};
 
-use crate::algebra::{quaternion::Quaternion};
+use crate::algebra::quaternion::Quaternion;
 use crate::hit::Hit;
 #[allow(unused)]
 use crate::iter_functions::AllEqual;
-use crate::ray::Ray;
+
 use crate::Vec3;
+use crate::ray::Ray;
 
 use super::Shape;
 
@@ -20,11 +20,11 @@ pub struct Triangle {
     edge_1: Vec3,
     edge_2: Vec3,
     v_1: Vec3,
-    v_2: Vec3
+    v_2: Vec3,
 }
 #[allow(dead_code)]
 impl Triangle {
-    pub fn new_triangle_looking_at_position(
+    pub fn looking_at_position(
         triangle_position: Vec3,
         looking_position: Vec3,
         height: f64,
@@ -102,6 +102,27 @@ impl Triangle {
             v_2: Vec3::zeros(),
         }
     }
+
+    pub fn get_distance(&self, ray: &Ray) -> Option<f64> {
+        let distance_to_plane = self.normal.dot(&(self.vertices[0] - ray.origin))
+            / self.normal.dot(&ray.direction_unit);
+        let point_on_plane = ray.at(distance_to_plane);
+
+        let a =
+            1. - (self.vertices[1] - point_on_plane).dot(&self.v_1) / self.edge_1.dot(&self.v_1);
+        if !(0. ..=1.).contains(&a) {
+            return None;
+        }
+
+        let b =
+            1. - (self.vertices[2] - point_on_plane).dot(&self.v_2) / self.edge_2.dot(&self.v_2);
+        if !(0. ..=1.).contains(&b) || a + b > 1. {
+            return None;
+        }
+
+        Some(distance_to_plane)
+    }
+
     #[allow(dead_code)]
     pub fn calculate_normal(&self) -> Vec3 {
         let vec1 = self.vertices[1] - self.vertices[0];
@@ -110,48 +131,56 @@ impl Triangle {
     }
 
     #[allow(clippy::manual_range_contains)]
-    pub fn get_hit_distance(&self, ray: &Ray) -> Option<f64> {
-        let distance_to_plane = self.normal.dot(&(self.vertices[0] - ray.origin))   // 5+, 3*
-            / self.normal.dot(&ray.direction_unit);                                 // 2+, 3*, 1/
-        let point_on_plane = ray.at(distance_to_plane);                             // 3+, 3*
 
-        let a = 1. - (self.vertices[1] - point_on_plane).dot(&self.v_1) / self.edge_1.dot(&self.v_1);      // 7+, 6*, 1/
-        if a > 1. || a < 0.{
-            return None;
-        }
-
-        let b = 1. - (self.vertices[2] - point_on_plane).dot(&self.v_2) / self.edge_2.dot(&self.v_2);       // 7+, 6*, 1/
-        if b > 1. || b < 0. || a + b > 1. {
-            return None;
-        }
-
-        Some(distance_to_plane)
-    }
-
-    pub fn bounding_points(&self) -> [Vec3; 2]{
+    pub fn bounding_points(&self) -> [Vec3; 2] {
         [
-            Vec3::new(self.vertices[0].x.min(self.vertices[1].x).min(self.vertices[2].x),
-            self.vertices[0].y.min(self.vertices[1].y).min(self.vertices[2].y),
-            self.vertices[0].z.min(self.vertices[1].z).min(self.vertices[2].z)),
-            Vec3::new(self.vertices[0].x.max(self.vertices[1].x).max(self.vertices[2].x),
-            self.vertices[0].y.max(self.vertices[1].y).max(self.vertices[2].y),
-            self.vertices[0].z.max(self.vertices[1].z).max(self.vertices[2].z)),
-        ]           
+            Vec3::new(
+                self.vertices[0]
+                    .x
+                    .min(self.vertices[1].x)
+                    .min(self.vertices[2].x),
+                self.vertices[0]
+                    .y
+                    .min(self.vertices[1].y)
+                    .min(self.vertices[2].y),
+                self.vertices[0]
+                    .z
+                    .min(self.vertices[1].z)
+                    .min(self.vertices[2].z),
+            ),
+            Vec3::new(
+                self.vertices[0]
+                    .x
+                    .max(self.vertices[1].x)
+                    .max(self.vertices[2].x),
+                self.vertices[0]
+                    .y
+                    .max(self.vertices[1].y)
+                    .max(self.vertices[2].y),
+                self.vertices[0]
+                    .z
+                    .max(self.vertices[1].z)
+                    .max(self.vertices[2].z),
+            ),
+        ]
     }
 }
 
-impl Display for Triangle{
+impl Display for Triangle {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", "Polygon with normal: ".to_string() + self.normal.to_string().as_str())
+        write!(
+            f, "{}",
+            "Polygon with normal: ".to_string() + self.normal.to_string().as_str()
+        )
     }
 }
 
-impl Shape for Triangle{
-    fn get_potential_hit(&self, ray: &crate::ray::Ray) -> Option<Hit> {
-        let potential_hit = self.get_hit_distance(ray);
+impl Shape for Triangle {
+    fn get_hit(&self, ray: &Ray) -> Option<Hit> {
+        let potential_hit = self.get_distance(ray);
 
-        if let Some(distance) = potential_hit{
-            return Some(Hit{
+        if let Some(distance) = potential_hit {
+            return Some(Hit {
                 distance,
                 position: ray.at(distance),
                 normal: self.normal,
@@ -160,23 +189,23 @@ impl Shape for Triangle{
         }
         None
     }
-    
-    fn pre_compute(&mut self){
+
+    fn pre_compute(&mut self) {
         self.edge_1 = self.vertices[1] - self.vertices[0];
         self.edge_2 = self.vertices[2] - self.vertices[0];
 
-        self.v_1 = self.edge_1 - self.edge_1.project(&self.edge_2);  
-        self.v_2 = self.edge_2 - self.edge_2.project(&self.edge_1);    
+        self.v_1 = self.edge_1 - self.edge_1.project(&self.edge_2);
+        self.v_2 = self.edge_2 - self.edge_2.project(&self.edge_1);
     }
 }
 
-impl MulAssign<f64> for Triangle{
+impl MulAssign<f64> for Triangle {
     fn mul_assign(&mut self, rhs: f64) {
         self.vertices.iter_mut().for_each(|vertex| *vertex *= rhs);
     }
 }
 
-impl AddAssign<Vec3> for Triangle{
+impl AddAssign<Vec3> for Triangle {
     fn add_assign(&mut self, rhs: Vec3) {
         self.vertices.iter_mut().for_each(|vertex| *vertex += rhs);
     }

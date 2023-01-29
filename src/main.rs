@@ -28,8 +28,9 @@ const WIDTH: u32 = 600;
 const HEIGHT: u32 = 400;
 #[show_image::main]
 fn main() {
-    let mut teapot = parser::parse_ascii_stl(fs::read_to_string("models/teapot.stl").unwrap().as_str()).unwrap();
-    teapot += Vec3::new(-80., -10., 0.1,);
+    let teapot_string = fs::read_to_string("models/teapot.stl").unwrap();
+    let mut teapot = parser::parse_ascii_stl(teapot_string.as_str()).unwrap();
+    teapot += Vec3::new(-80., -5., 0.1,);
     teapot *= 0.01;
     let mut camera = Camera::new(PI / 4., WIDTH);
     camera.position = Vec3::new(2., 0.5, 2.);
@@ -39,9 +40,10 @@ fn main() {
     let mut scene = Scene::new(camera, img);
     add_floor_to_scene(&mut scene);
     add_sky_light_to_scene(&mut scene);
-    scene.add_hittable(Into::<Hittable>::into(teapot).with_color(0., 0., 1.).with_specular(0.3));
+    scene.world.background = Vec3::new(0.5,0.5,0.5);
+    scene.add_hittable(Into::<Hittable>::into(teapot).with_color(0., 0., 0.8).with_specular(0.5));
     print!("{}", scene);
-    scene.render(3);
+    scene.render(4);
 
 
     let window = create_window(
@@ -66,8 +68,8 @@ fn add_basic_elements(scene : &mut Scene){
             .with_ior(4.),
     );
     scene.add_hittable(
-        Hittable::with_polygon(Triangle::new_triangle_looking_at_position(
-            Vec3::new(13., 2., 15.), scene.camera.position, 4.))
+        Hittable::with_polygon(Triangle::looking_at_position(
+            Vec3::new(13., 2., 15.), scene.world.camera.position, 4.))
             .with_luminance(1.,1.,1.)
     );
     scene.add_hittable(Hittable::with_sphere(Sphere::new(2, 0, 0.5, 0.5)).with_color(1., 1., 1.));
@@ -105,6 +107,6 @@ fn add_sky_light_to_scene(scene : &mut Scene) {
     scene.add_hittable(
         Hittable::with_polygon(light)
             .with_color(0., 0., 0.)
-            .with_luminance(1., 1., 1.),
+            .with_luminance(0.9, 0.9, 0.9),
     );
 }

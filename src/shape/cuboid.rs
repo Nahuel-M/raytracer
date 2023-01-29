@@ -1,8 +1,7 @@
-use std::{fmt::Display, ops::{Add, AddAssign, MulAssign}};
+use std::{fmt::Display, ops::{AddAssign, MulAssign}};
 
-use crate::{algebra::vec3::Vec3, ray::Ray, hit::Hit};
+use crate::{algebra::vec3::Vec3, ray::Ray};
 
-use super::Shape;
 
 #[derive(Debug)]
 pub struct Cuboid{
