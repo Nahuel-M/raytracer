@@ -1,9 +1,10 @@
 Basic raytracer written completely in Rust.
 
 To do:
-- [ ] Pass world to hittable to make it return info autonomously
-- [ ] Make camera rotate with quaternion around stable axis
+- [ ] Pass world to hittable to make it return info autonomously?
+- [x] Make camera rotate with quaternion around stable axis (without roll)
 - [x] Increase efficiency of polygon hit calculation
 - [ ] Normals for vertices, interpolate normal for polygon
 - [x] Add precompute function for shape to speed up rendering
 - [ ] Add proper dielectric material
+- [ ] SIMD? Research and implementation
