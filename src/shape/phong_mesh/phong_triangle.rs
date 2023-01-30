@@ -4,7 +4,7 @@ use crate::{algebra::vec3::Vec3, hit::Hit, shape::Shape, ray::Ray};
 
 use super::phong_vertex::PhongVertex;
 
-pub(crate) struct PhongTriangle<'a>{
+pub struct PhongTriangle<'a>{
     vertices: [&'a PhongVertex; 3],
     pub normal: Vec3,
     pub parallel_to_surface: Vec3,
@@ -22,21 +22,40 @@ impl Display for PhongTriangle<'_>{
 
 impl PhongTriangle<'_>{
     pub fn get_hit_distance(&self, ray: &Ray) -> Option<f64> {
-        let distance_to_plane = self.normal.dot(&(self.vertices[0].position - ray.origin))   // 5+, 3*
-            / self.normal.dot(&ray.direction_unit);                                 // 2+, 3*, 1/
-        let point_on_plane = ray.at(distance_to_plane);                             // 3+, 3*
+        let distance_to_plane = self.normal.dot(&(self.vertices[0].position - ray.origin))   
+            / self.normal.dot(&ray.direction_unit);                                 
+        let point_on_plane = ray.at(distance_to_plane);                             
 
-        let a = 1. - (self.vertices[1].position - point_on_plane).dot(&self.v_1) / self.edge_1.dot(&self.v_1);      // 7+, 6*, 1/
+        let a = 1. - (self.vertices[1].position - point_on_plane).dot(&self.v_1) / self.edge_1.dot(&self.v_1);      
         if !(0. ..=1.).contains(&a){
             return None;
         }
 
-        let b = 1. - (self.vertices[2].position - point_on_plane).dot(&self.v_2) / self.edge_2.dot(&self.v_2);       // 7+, 6*, 1/
+        let b = 1. - (self.vertices[2].position - point_on_plane).dot(&self.v_2) / self.edge_2.dot(&self.v_2);       
         if !(0. ..=1.).contains(&b) || a + b > 1. {
             return None;
         }
 
         Some(distance_to_plane)
+    }
+    pub fn get_hit_info(&self, ray: &Ray) -> Option<f64, Vec3> {
+        let distance_to_plane = self.normal.dot(&(self.vertices[0].position - ray.origin))   
+            / self.normal.dot(&ray.direction_unit);                                 
+        let point_on_plane = ray.at(distance_to_plane);                             
+
+        let a = 1. - (self.vertices[1].position - point_on_plane).dot(&self.v_1) / self.edge_1.dot(&self.v_1);      
+        if !(0. ..=1.).contains(&a){
+            return None;
+        }
+
+        let b = 1. - (self.vertices[2].position - point_on_plane).dot(&self.v_2) / self.edge_2.dot(&self.v_2);       
+        if !(0. ..=1.).contains(&b) || a + b > 1. {
+            return None;
+        }
+
+        let mut normal = a * self.vertices[1] + b * self.vertices[2] + (1-a-b) * self.vertices[0];
+        normal.normalize();
+        Some(distance_to_plane, normal)
     }
 }
 

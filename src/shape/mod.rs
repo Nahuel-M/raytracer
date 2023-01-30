@@ -12,4 +12,6 @@ pub mod cuboid;
 pub trait Shape : Sync + Display{
     fn pre_compute(&mut self);
     fn get_hit(&self, ray: &Ray) -> Option<Hit>;
+
+    // fn parse_hit(&self, ray: &Ray, hit: Hit);
 }

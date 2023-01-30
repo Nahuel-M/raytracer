@@ -103,7 +103,7 @@ impl Triangle {
         }
     }
 
-    pub fn get_distance(&self, ray: &Ray) -> Option<f64> {
+    pub fn get_distance(&self, ray: &Ray) -> Option<(f64, Vec3)> {
         let distance_to_plane = self.normal.dot(&(self.vertices[0] - ray.origin))
             / self.normal.dot(&ray.direction_unit);
         let point_on_plane = ray.at(distance_to_plane);
@@ -120,7 +120,7 @@ impl Triangle {
             return None;
         }
 
-        Some(distance_to_plane)
+        Some((distance_to_plane, point_on_plane))
     }
 
     #[allow(dead_code)]
@@ -179,10 +179,10 @@ impl Shape for Triangle {
     fn get_hit(&self, ray: &Ray) -> Option<Hit> {
         let potential_hit = self.get_distance(ray);
 
-        if let Some(distance) = potential_hit {
+        if let Some((distance, position)) = potential_hit {
             return Some(Hit {
                 distance,
-                position: ray.at(distance),
+                position,
                 normal: self.normal,
                 parallel_to_surface: self.parallel_to_surface,
             })

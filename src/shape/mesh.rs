@@ -32,36 +32,7 @@ impl Display for Mesh{
 }
 
 impl Shape for Mesh{
-    // fn get_potential_hit(&mut self, ray: &Ray) -> Option<Hit> {
-    //     if !self.bounding_box.test_collision(ray){
-    //         return None;
-    //     }
-
-    //     let potential_hit = self
-    //         .polygons
-    //         .iter()
-    //         .map(|polygon| (polygon, polygon.get_distance(ray)))
-    //         .filter(|(_polygon, distance)| distance.is_some())
-    //         .map(|(polygon, distance)| (polygon, distance.unwrap()))
-    //         .reduce(|accumulator, (polygon, distance)| {
-    //             if distance < accumulator.1 {
-    //                 (polygon, distance)
-    //             } else {
-    //                 accumulator
-    //             }
-    //         });
-
-    //     if let Some((polygon, distance)) = potential_hit {
-    //         return Some(Hit {
-    //             distance,
-    //             position: ray.at(distance),
-    //             normal: polygon.normal,
-    //             parallel_to_surface: polygon.parallel_to_surface,
-    //         });
-    //     }
-    //     None
-    // }
-    fn pre_compute(&mut self){
+     fn pre_compute(&mut self){
         for polygon in &mut  self.polygons{
             polygon.pre_compute();
         }
@@ -76,16 +47,16 @@ impl Shape for Mesh{
             .polygons
             .iter()
             .map(|polygon| (polygon, polygon.get_distance(ray)))
-            .filter(|(_polygon, distance)| distance.is_some())
-            .map(|(polygon, distance)| (polygon, distance.unwrap()))
-            .reduce(|accumulator, (polygon, distance)| {
-                if distance < accumulator.1 {
-                    (polygon, distance)
+            .filter(|(_polygon, hit)| hit.is_some())
+            .map(|(polygon, hit)| (polygon, hit.unwrap()))
+            .reduce(|accumulator, (polygon, (distance, hit))| {
+                if distance < accumulator.1.0 {
+                    (polygon, (distance, hit))
                 } else {
                     accumulator
                 }
             });
-            if let Some((polygon, distance)) = potential_hit {
+            if let Some((polygon, (distance,hit))) = potential_hit {
                 return Some(Hit{
                     distance,
                     position: ray.at(distance),

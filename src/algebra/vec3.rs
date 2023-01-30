@@ -2,6 +2,7 @@ use std::{
     fmt::Display,
     ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
 };
+
 #[derive(Debug, Clone, Copy)]
 pub struct Vec3 {
     pub x: f64,
@@ -51,7 +52,12 @@ impl Vec3 {
     pub fn sum(&self) -> f64 {
         self.x + self.y + self.z
     }
-
+    pub fn x() -> Vec3 {
+        Vec3 {x: 1., y: 0., z: 0. }
+    }
+    pub fn y() -> Vec3 {
+        Vec3 {x: 0., y: 1., z: 0. }
+    }
     pub fn z() -> Vec3 {
         Vec3 {x: 0., y: 0., z: 1. }
     }

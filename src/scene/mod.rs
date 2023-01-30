@@ -56,7 +56,7 @@ impl<'a> Scene<'a> {
     pub fn render(&mut self, super_samples: usize){
         let now = std::time::Instant::now();
         
-        print!("Pre-computing... ");
+        print!("Pre-computing...");
         io::stdout().flush().unwrap();
 
         for hittable in &mut self.world.hittables{
@@ -96,14 +96,14 @@ impl<'a> Scene<'a> {
             average_pixel /= (super_samples*super_samples) as f64;
             
             *pixel = Vector3Wrapper(average_pixel).into();
-            
+
             if x == 0{
                 let new_progress = counter.load(Relaxed) + 1;
                 counter.store(new_progress, Relaxed);
-                print!("\rRendering... {}% done.", new_progress * 100 / row_count);
+                print!("\rRendering... {}% done", new_progress * 100 / row_count);
             }
         });
-        println!(" done in {:.2} seconds", now.elapsed().as_secs_f32());
+        println!(" in {:.2} seconds", now.elapsed().as_secs_f32());
     }
     fn color_for_ray(ray : &Ray, world: &World, remaining_depth : u8) -> Vec3{
         let hittables = &world.hittables;
