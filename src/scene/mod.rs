@@ -29,12 +29,6 @@ impl Display for Scene<'_>{
     }
 }
 
-struct Vector3Wrapper(Vec3);
-impl From<Vector3Wrapper> for Rgba<u8>{
-    fn from(val: Vector3Wrapper) -> Self {
-        Rgba([(val.0.x*255.).min(255.) as u8, (val.0.y*255.).min(255.) as u8, (val.0.z*255.).min(255.) as u8, 255_u8])
-    }
-}
 #[allow(dead_code)]
 impl<'a> Scene<'a> {
     pub fn new(
@@ -95,7 +89,7 @@ impl<'a> Scene<'a> {
             }
             average_pixel /= (super_samples*super_samples) as f64;
             
-            *pixel = Vector3Wrapper(average_pixel).into();
+            *pixel = average_pixel.clamp_to_rgba();
 
             if x == 0{
                 let new_progress = counter.load(Relaxed) + 1;

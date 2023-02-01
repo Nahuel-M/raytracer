@@ -3,6 +3,8 @@ use std::{
     ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
 };
 
+use image::Rgba;
+
 #[derive(Debug, Clone, Copy)]
 pub struct Vec3 {
     pub x: f64,
@@ -11,11 +13,11 @@ pub struct Vec3 {
 }
 #[allow(dead_code)]
 impl Vec3 {
-    pub fn new(x: f64, y: f64, z: f64) -> Self {
+    pub const fn new(x: f64, y: f64, z: f64) -> Self {
         Vec3 { x, y, z }
     }
 
-    pub fn zeros() -> Self{
+    pub const fn zeros() -> Self{
         Vec3::new(0., 0., 0.,)
     }
     pub fn dot(&self, other: &Vec3) -> f64 {
@@ -72,6 +74,10 @@ impl Vec3 {
     }
     pub fn ew_max(&self, other: Vec3) -> Vec3{
         Vec3::new(self.x.max(other.x), self.y.max(other.y), self.z.max(other.z))
+    }
+
+    pub fn clamp_to_rgba(&self) -> Rgba<u8>{
+        Rgba([(self.x*255.).min(255.) as u8, (self.y*255.).min(255.) as u8, (self.z*255.).min(255.) as u8, 255_u8])
     }
 }
 
