@@ -7,12 +7,15 @@ pub struct Renderer {}
 
 impl Renderer {
     pub fn render(
-        world: &World,
+        world: &mut World,
         image: &mut ImageBuffer<Rgba<u8>, Vec<<Rgba<u8> as Pixel>::Subpixel>>,
         super_samples_sqrt: usize,
         ray_depth: usize,
     ) {
-        
+        let start_time = std::time::Instant::now();
+        world.pre_compute();
+
+        println!("Started rendering.");
         let half_width: f64 = image.width() as f64 / 2.;
         let half_height: f64 = image.height() as f64 / 2.;
 
@@ -40,12 +43,14 @@ impl Renderer {
                     y as f64 + super_pixel.1 - half_height,
                 );
 
-                average_pixel += Renderer::advance_ray(&ray, &world, ray_depth);
+                average_pixel += Renderer::advance_ray(&ray, world, ray_depth);
             }
             average_pixel /= (super_samples_sqrt * super_samples_sqrt) as f64;
 
             *pixel = average_pixel.clamp_to_rgba();
         });
+        
+        println!("Rendering done in in {:.2} seconds", start_time.elapsed().as_secs_f32());
     }
 
     fn advance_ray(ray: &Ray, world: &World, remaining_depth : usize) -> Vec3{
@@ -54,26 +59,27 @@ impl Renderer {
         }
         let potential_hit = world.get_ray_collision(ray);
         if let Some(hit) = potential_hit {
-
+            let material = hit.material.unwrap();
+            let material = material.read().unwrap();
             let mut final_color = Vec3::new(0., 0., 0.);
             
-            final_color += hit.material.luminance;
-            if hit.material.specular > 0.001 {
-                final_color += hit.material.specular * {
+            final_color += material.luminance;
+            if material.specular > 0.001 {
+                final_color += material.specular * {
                     let specular_ray = ray.reflect_specular(hit.normal, hit.position);
                     Renderer::advance_ray(&specular_ray, world, remaining_depth - 1)
                 };
             }
-            if hit.material.specular + hit.material.refraction < 0.999 && hit.material.color.sum() > 0.001 {
+            if material.specular + material.refraction < 0.999 && material.color.sum() > 0.001 {
                 let orthogonal_to_normal = hit.parallel_to_surface;
-                final_color += (1. - hit.material.specular - hit.material.refraction) * hit.material.color * {
+                final_color += (1. - material.specular - material.refraction) * material.color * {
                     let diffuse_ray = ray.reflect_diffuse(hit.normal, orthogonal_to_normal, hit.position);
                     Renderer::advance_ray(&diffuse_ray, world, remaining_depth - 1)
                 };
             }
-            if hit.material.refraction > 0.001 {
-                final_color += hit.material.refraction * {
-                    let refract_ray = ray.refract(hit.normal, hit.position, hit.material.ior);
+            if material.refraction > 0.001 {
+                final_color += material.refraction * {
+                    let refract_ray = ray.refract(hit.normal, hit.position, material.ior);
                     Renderer::advance_ray(&refract_ray, world, remaining_depth - 1)
                 };
             }

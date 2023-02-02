@@ -35,20 +35,21 @@ fn main() {
     // teapot += Vec3::new(-80., -5., 0.1,);
     // teapot *= 0.01;
     let mut camera = Camera::new(PI / 4., WIDTH);
-    camera.position = Vec3::new(80., 60., 40.);
-    camera.look_at(Vec3::new(80., 0., 40.));
+    camera.position = Vec3::new(0., 40., -300.);
+    camera.look_at(Vec3::new(0., 32., 20.));
     let mut image = RgbaImage::new(WIDTH, HEIGHT);
 
     let mut world = World::with_camera(camera);
-    world.insert_model_by_filename("models/teapot.stl");
+    let teapot = world.insert_model_by_filename("models/teapot.obj");
+    let _floor = world.insert_model_by_filename("models/floor.stl");
     world.background = Vec3::new(0.5,0.5,0.5);
-
-    Renderer::render(&world, &mut image, 2, 4);
-
+    teapot.material.write().unwrap().specular = 0.5;
+    println!("{world}");
+    Renderer::render(&mut world, &mut image, 5, 3);
 
     let window = create_window(
         "image",
-        WindowOptions::new().set_size(Some([WIDTH, HEIGHT])),
+        WindowOptions::new().set_size(Some([WIDTH, HEIGHT])).set_default_controls(true),
     )
     .unwrap();
     // renderer::render_polygons(&camera, &polygons, &mut img);
@@ -57,56 +58,3 @@ fn main() {
         .unwrap();
     window.wait_until_destroyed().unwrap();
 }
-
-// #[allow(unused)]
-// fn add_basic_elements(scene : &mut Scene){
-//     scene.add_hittable(
-//         Hittable::with_sphere(Sphere::new(0, 0, 1.2, 1))
-//             .with_color(1., 1., 0.)
-//             .with_specular(0.3)
-//             .with_refraction(0.7)
-//             .with_ior(4.),
-//     );
-//     scene.add_hittable(
-//         Hittable::with_polygon(Triangle::looking_at_position(
-//             Vec3::new(13., 2., 15.), scene.world.camera.position, 4.))
-//             .with_luminance(1.,1.,1.)
-//     );
-//     scene.add_hittable(Hittable::with_sphere(Sphere::new(2, 0, 0.5, 0.5)).with_color(1., 1., 1.));
-//     scene.add_hittable(
-//         Hittable::with_polygon(Triangle::new(
-//             (0., -1., -5.),
-//             (200., -1., 100.),
-//             (-200., -1., 100.),
-//         ))
-//         .with_color(1., 0.5, 1.),
-//     );
-//     let light = Triangle::new((-30., 3., 10.), (30., 3., 10.), (0., 3., -30.));
-//     scene.add_hittable(
-//         Hittable::with_polygon(light)
-//             .with_color(0., 0., 0.)
-//             .with_luminance(0.6, 0.6, 0.6),
-//     );
-
-//     // println!("{:?}", scene.objects);
-// }
-
-// fn add_floor_to_scene(scene : &mut Scene){
-//     scene.add_hittable(
-//         Hittable::with_polygon(Triangle::new(
-//             (0., 0., -300.),
-//             (200., 0., 200.),
-//             (-200., 0., 200.),
-//         ))
-//         .with_color(1., 0.5, 1.),
-//     );
-// }
-
-// fn add_sky_light_to_scene(scene : &mut Scene) {
-//     let light = Triangle::new((-20., 4., 20.), (20., 4., 10.), (0., 4., -20.));
-//     scene.add_hittable(
-//         Hittable::with_polygon(light)
-//             .with_color(0., 0., 0.)
-//             .with_luminance(0.9, 0.9, 0.9),
-//     );
-// }

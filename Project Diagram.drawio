@@ -1,59 +1,59 @@
-<mxfile host="Electron" modified="2023-01-30T15:27:23.083Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/20.8.10 Chrome/106.0.5249.199 Electron/21.3.5 Safari/537.36" etag="BBiUtlzRH6PLUTt6SMGD" compressed="false" version="20.8.10" type="device">
+<mxfile host="Electron" modified="2023-02-01T16:12:56.511Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/20.8.10 Chrome/106.0.5249.199 Electron/21.3.5 Safari/537.36" etag="t0AMk-Am4fDLMdsL5Cvm" compressed="false" version="20.8.10" type="device">
   <diagram name="World description" id="bvDnlhXWyBqHuonZeT2K">
-    <mxGraphModel dx="1480" dy="877" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="863" dy="512" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="HUqvqLyJJ_kkcIIuTqEg-1" value="World" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fontSize=20;" vertex="1" parent="1">
+        <mxCell id="HUqvqLyJJ_kkcIIuTqEg-1" value="World" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fontSize=22;spacingLeft=3;" vertex="1" parent="1">
           <mxGeometry x="80" y="80" width="550" height="800" as="geometry" />
         </mxCell>
         <mxCell id="HUqvqLyJJ_kkcIIuTqEg-2" value="Vec" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fontSize=17;startSize=30;" vertex="1" parent="1">
-          <mxGeometry x="80" y="200" width="200" height="80" as="geometry" />
+          <mxGeometry x="110" y="200" width="200" height="80" as="geometry" />
         </mxCell>
         <mxCell id="HUqvqLyJJ_kkcIIuTqEg-3" value="Vertex&lt;br&gt;- position&amp;nbsp;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;Vec3" style="rounded=0;whiteSpace=wrap;html=1;fontSize=17;align=left;spacingLeft=4;" vertex="1" parent="1">
-          <mxGeometry x="110" y="200" width="520" height="80" as="geometry" />
+          <mxGeometry x="140" y="200" width="490" height="80" as="geometry" />
         </mxCell>
         <mxCell id="HUqvqLyJJ_kkcIIuTqEg-4" value="Vec" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fontSize=17;startSize=30;" vertex="1" parent="1">
-          <mxGeometry x="80" y="280" width="200" height="80" as="geometry" />
+          <mxGeometry x="110" y="280" width="200" height="80" as="geometry" />
         </mxCell>
         <mxCell id="HUqvqLyJJ_kkcIIuTqEg-5" value="Triangle&lt;br&gt;- vertices&amp;nbsp;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;/span&gt;[&amp;amp;Vertex; 3]&lt;br&gt;- shading_properties&amp;nbsp;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&amp;amp;ShadingProperties" style="rounded=0;whiteSpace=wrap;html=1;fontSize=17;align=left;spacingLeft=4;" vertex="1" parent="1">
-          <mxGeometry x="110" y="280" width="520" height="80" as="geometry" />
+          <mxGeometry x="140" y="280" width="490" height="80" as="geometry" />
         </mxCell>
         <mxCell id="HUqvqLyJJ_kkcIIuTqEg-7" value="Vec" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fontSize=17;startSize=30;" vertex="1" parent="1">
-          <mxGeometry x="80" y="360" width="30" height="100" as="geometry" />
+          <mxGeometry x="110" y="360" width="30" height="100" as="geometry" />
         </mxCell>
         <mxCell id="HUqvqLyJJ_kkcIIuTqEg-8" value="ShadingProperties&lt;br&gt;- material&amp;nbsp;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&amp;amp;Material&lt;br&gt;- vertex_normals&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;Option&amp;lt;[&amp;amp;VertexNormal; 3]&amp;gt;&lt;br&gt;- vertex_colors&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;Option&amp;lt;[&amp;amp;VertexColor; 3]&amp;gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=17;align=left;spacingLeft=4;" vertex="1" parent="1">
-          <mxGeometry x="110" y="360" width="520" height="100" as="geometry" />
+          <mxGeometry x="140" y="360" width="490" height="100" as="geometry" />
         </mxCell>
         <mxCell id="HUqvqLyJJ_kkcIIuTqEg-9" value="Vec" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fontSize=17;startSize=30;" vertex="1" parent="1">
-          <mxGeometry x="80" y="600" width="200" height="80" as="geometry" />
+          <mxGeometry x="110" y="600" width="200" height="80" as="geometry" />
         </mxCell>
         <mxCell id="HUqvqLyJJ_kkcIIuTqEg-10" value="VertexNormal&lt;br&gt;- normal&amp;nbsp;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;/span&gt;Vec3" style="rounded=0;whiteSpace=wrap;html=1;fontSize=17;align=left;spacingLeft=4;" vertex="1" parent="1">
-          <mxGeometry x="110" y="600" width="520" height="80" as="geometry" />
+          <mxGeometry x="140" y="600" width="490" height="80" as="geometry" />
         </mxCell>
         <mxCell id="HUqvqLyJJ_kkcIIuTqEg-11" value="Vec" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fontSize=17;startSize=30;" vertex="1" parent="1">
-          <mxGeometry x="80" y="680" width="200" height="80" as="geometry" />
+          <mxGeometry x="110" y="680" width="200" height="80" as="geometry" />
         </mxCell>
         <mxCell id="HUqvqLyJJ_kkcIIuTqEg-12" value="VertexColor&lt;br&gt;- color&amp;nbsp;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;/span&gt;Vec3" style="rounded=0;whiteSpace=wrap;html=1;fontSize=17;align=left;spacingLeft=4;" vertex="1" parent="1">
-          <mxGeometry x="110" y="680" width="520" height="80" as="geometry" />
+          <mxGeometry x="140" y="680" width="490" height="80" as="geometry" />
         </mxCell>
         <mxCell id="HUqvqLyJJ_kkcIIuTqEg-13" value="Vec" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fontSize=17;startSize=30;" vertex="1" parent="1">
-          <mxGeometry x="80" y="460" width="200" height="140" as="geometry" />
+          <mxGeometry x="110" y="460" width="200" height="140" as="geometry" />
         </mxCell>
         <mxCell id="HUqvqLyJJ_kkcIIuTqEg-14" value="Material&lt;br&gt;- diffuse&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;/span&gt;Vec3 / Texture&lt;br&gt;- specular&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;f64 range (0-1) / Texture&lt;br&gt;- refraction&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;f64 range (0-1) / Texture&lt;br&gt;- IOR&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;f64 / Texture&lt;br&gt;- etc..." style="rounded=0;whiteSpace=wrap;html=1;fontSize=17;align=left;spacingLeft=4;" vertex="1" parent="1">
-          <mxGeometry x="110" y="460" width="520" height="140" as="geometry" />
+          <mxGeometry x="140" y="460" width="490" height="140" as="geometry" />
         </mxCell>
         <mxCell id="HUqvqLyJJ_kkcIIuTqEg-15" value="Vec" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fontSize=17;startSize=30;" vertex="1" parent="1">
-          <mxGeometry x="80" y="760" width="200" height="100" as="geometry" />
+          <mxGeometry x="110" y="760" width="200" height="100" as="geometry" />
         </mxCell>
         <mxCell id="HUqvqLyJJ_kkcIIuTqEg-16" value="Model&lt;br&gt;- vertices&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;Vec&amp;lt;&amp;amp;Vertex&amp;gt;&lt;br&gt;- faces&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;	&lt;/span&gt;Vec&amp;lt;&amp;amp;Triangle&amp;gt;&lt;br&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=17;align=left;spacingLeft=4;" vertex="1" parent="1">
-          <mxGeometry x="110" y="760" width="520" height="100" as="geometry" />
+          <mxGeometry x="140" y="760" width="490" height="100" as="geometry" />
         </mxCell>
         <mxCell id="HUqvqLyJJ_kkcIIuTqEg-19" value="sky_color: Vec3 / Texture" style="rounded=0;whiteSpace=wrap;html=1;fontSize=17;align=left;spacingLeft=4;" vertex="1" parent="1">
-          <mxGeometry x="80" y="120" width="550" height="40" as="geometry" />
+          <mxGeometry x="110" y="120" width="520" height="40" as="geometry" />
         </mxCell>
         <mxCell id="HUqvqLyJJ_kkcIIuTqEg-20" value="camera: Camera" style="rounded=0;whiteSpace=wrap;html=1;fontSize=17;align=left;spacingLeft=4;" vertex="1" parent="1">
-          <mxGeometry x="80" y="160" width="550" height="40" as="geometry" />
+          <mxGeometry x="110" y="160" width="520" height="40" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

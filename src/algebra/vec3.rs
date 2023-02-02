@@ -1,6 +1,6 @@
 use std::{
     fmt::Display,
-    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
+    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign}, iter::Sum,
 };
 
 use image::Rgba;
@@ -226,6 +226,18 @@ impl Neg for Vec3 {
             y: -self.y,
             z: -self.z,
         }
+    }
+}
+
+impl Sum<Vec3> for Vec3{
+    fn sum<I: Iterator<Item = Vec3>>(iter: I) -> Self {
+        iter.reduce(|acc, vec3| acc + vec3).unwrap()
+    }
+}
+
+impl<'a> Sum<&'a Self> for Vec3{
+    fn sum<I: Iterator<Item = &'a Self>>(iter: I) -> Self {
+        iter.fold(Vec3::zeros(),|acc, &vec3| acc + vec3)
     }
 }
 
