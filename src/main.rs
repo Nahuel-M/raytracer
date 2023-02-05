@@ -35,17 +35,19 @@ fn main() {
     // teapot += Vec3::new(-80., -5., 0.1,);
     // teapot *= 0.01;
     let mut camera = Camera::new(PI / 4., WIDTH);
-    camera.position = Vec3::new(0., 40., -300.);
+    camera.position = Vec3::new(-100., 80., -200.);
     camera.look_at(Vec3::new(0., 32., 20.));
     let mut image = RgbaImage::new(WIDTH, HEIGHT);
 
     let mut world = World::with_camera(camera);
-    let teapot = world.insert_model_by_filename("models/teapot.obj");
+    let mut teapot = world.insert_model_by_filename("models/teapot.obj");
     let _floor = world.insert_model_by_filename("models/floor.stl");
     world.background = Vec3::new(0.5,0.5,0.5);
-    teapot.material.write().unwrap().specular = 0.5;
+    teapot.material.write().unwrap().specular = 1.;
+    teapot.material.write().unwrap().color = Vec3::new(0.8, 0.6, 0.4);
+    teapot += Vec3::new(0., 35., 0.,);
     println!("{world}");
-    Renderer::render(&mut world, &mut image, 5, 3);
+    Renderer::render(&mut world, &mut image, 3, 5);
 
     let window = create_window(
         "image",

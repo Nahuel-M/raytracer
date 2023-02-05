@@ -15,10 +15,14 @@ pub struct TriangleHitParser {
 
 impl TriangleHitParser {
     pub fn get_hit_distance(&self, ray: &Ray) -> Option<f64> {
+        let predot = self.normal.dot(&ray.direction_unit);
+        if (-0.01..0.01).contains(&predot){
+            return None
+        }
         let distance_to_plane =
-            self.normal.dot(&(self.p1 - ray.origin)) / self.normal.dot(&ray.direction_unit);
+            self.normal.dot(&(self.p1 - ray.origin)) / predot;
 
-        if distance_to_plane < 0.0001 {
+        if distance_to_plane < 0.01 {
             return None;
         }
 

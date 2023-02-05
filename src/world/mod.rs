@@ -1,17 +1,19 @@
 use std::{fmt::Display, fs, sync::{Arc, RwLock}};
 pub mod camera;
 pub mod model;
+pub mod vertex;
 mod parser;
 pub mod triangle;
 mod triangle_hit_parser;
+mod bvh;
 
 use crate::{algebra::vec3::Vec3, hit::Hit, material::Material, ray::Ray};
 
 use self::{
-    camera::Camera, model::Model, triangle::Triangle, triangle_hit_parser::TriangleHitParser,
+    camera::Camera, model::Model, triangle::Triangle, triangle_hit_parser::TriangleHitParser, vertex::Vertex,
 };
 
-pub struct Vertex(Vec3);
+
 pub struct VertexNormal(Vec3);
 pub struct VertexColor(Vec3);
 
@@ -39,14 +41,13 @@ impl<'a> World {
             // models: vec![],
         }
     }
-
     pub fn insert_model_by_filename(&'a mut self, filename: &str) -> Model {
         let (_name, extension) = filename.split_once('.').unwrap_or(("", ""));
         let file_string = fs::read_to_string(filename).unwrap();
         match extension {
             "stl" => parser::parse_ascii_stl(file_string.as_str(), self),
             "obj" => parser::parse_ascii_obj(file_string.as_str(), self),
-            _ => Model{ vertex_indexes: vec![], material: Arc::new(RwLock::new(Material::base_diffuse())) }
+            _ => Model{ vertices: vec![], material: Arc::new(RwLock::new(Material::base_diffuse())) }
         }
     }
 
@@ -85,8 +86,8 @@ impl<'a> World {
                 distance,
                 position: ray.at(distance),
                 normal,
-                parallel_to_surface: (self.vertices[triangle.vertex_indexes[0]].0
-                    - self.vertices[triangle.vertex_indexes[1]].0)
+                parallel_to_surface: (triangle.vertices[0].get()
+                    - triangle.vertices[1].get())
                     .normalize(),
                 material: Some(triangle.material.clone()),
             });
@@ -99,7 +100,7 @@ impl<'a> World {
 
         for triangle in self.triangles.iter() {
             self.triangle_hit_parsers
-                .push(triangle.generate_hit_parser(&self.vertices))
+                .push(triangle.generate_hit_parser())
         }
     }
 }

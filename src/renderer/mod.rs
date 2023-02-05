@@ -62,20 +62,28 @@ impl Renderer {
             let material = hit.material.unwrap();
             let material = material.read().unwrap();
             let mut final_color = Vec3::new(0., 0., 0.);
+            let directionality = ray.direction_unit.dot(&hit.normal);
             
-            final_color += material.luminance;
-            if material.specular > 0.001 {
-                final_color += material.specular * {
-                    let specular_ray = ray.reflect_specular(hit.normal, hit.position);
-                    Renderer::advance_ray(&specular_ray, world, remaining_depth - 1)
-                };
-            }
-            if material.specular + material.refraction < 0.999 && material.color.sum() > 0.001 {
-                let orthogonal_to_normal = hit.parallel_to_surface;
-                final_color += (1. - material.specular - material.refraction) * material.color * {
-                    let diffuse_ray = ray.reflect_diffuse(hit.normal, orthogonal_to_normal, hit.position);
-                    Renderer::advance_ray(&diffuse_ray, world, remaining_depth - 1)
-                };
+            if directionality < 0.{
+                final_color += material.luminance;
+                if material.specular > 0.001{
+                    final_color += material.specular * {
+                        let specular_ray = ray.reflect_specular(hit.normal, hit.position);
+                        Renderer::advance_ray(&specular_ray, world, remaining_depth - 1)
+                    };
+                }
+                if material.specular + material.refraction < 0.999 
+                    && material.color.sum() > 0.001{
+                    let orthogonal_to_normal = hit.parallel_to_surface;
+                    final_color += (1. - material.specular - material.refraction) * material.color * {
+                        let diffuse_ray = ray.reflect_diffuse(hit.normal, orthogonal_to_normal, hit.position);
+                        Renderer::advance_ray(&diffuse_ray, world, remaining_depth - 1)
+                    };
+                }
+            } else{
+                let mut new_ray = *ray;
+                new_ray.origin = hit.position;
+                final_color += Renderer::advance_ray(&new_ray, world, remaining_depth);
             }
             if material.refraction > 0.001 {
                 final_color += material.refraction * {
