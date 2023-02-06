@@ -1,17 +1,12 @@
-// mod hittable;
+
 mod material;
-// mod parser;
 mod ray;
 mod world;
-// mod shape;
-// mod transformations;
 mod algebra;
 mod hit;
 mod renderer;
 
 use std::f64::consts::PI;
-use std::fs;
-
 use show_image::{create_window, AsImageView, WindowOptions};
 
 use image::RgbaImage;
@@ -30,10 +25,6 @@ const WIDTH: u32 = 600;
 const HEIGHT: u32 = 400;
 #[show_image::main]
 fn main() {
-    // let teapot_string = fs::read_to_string("models/teapot.stl").unwrap();
-    // let mut teapot = parser::parse_ascii_stl(teapot_string.as_str()).unwrap();
-    // teapot += Vec3::new(-80., -5., 0.1,);
-    // teapot *= 0.01;
     let mut camera = Camera::new(PI / 4., WIDTH);
     camera.position = Vec3::new(-100., 80., -200.);
     camera.look_at(Vec3::new(0., 32., 20.));
@@ -43,7 +34,7 @@ fn main() {
     let mut teapot = world.insert_model_by_filename("models/teapot.obj");
     let _floor = world.insert_model_by_filename("models/floor.stl");
     world.background = Vec3::new(0.5,0.5,0.5);
-    teapot.material.write().unwrap().specular = 1.;
+    teapot.material.write().unwrap().specular = 0.;
     teapot.material.write().unwrap().color = Vec3::new(0.8, 0.6, 0.4);
     teapot += Vec3::new(0., 35., 0.,);
     println!("{world}");

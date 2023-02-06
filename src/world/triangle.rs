@@ -1,6 +1,6 @@
 use std::sync::{Arc, RwLock};
 
-use crate::{algebra::vec3::Vec3, ray::Ray, material::Material};
+use crate::{algebra::vec3::Vec3, material::Material};
 
 use super::{
     triangle_hit_parser::TriangleHitParser, Vertex,
@@ -32,8 +32,7 @@ impl Triangle {
 
         TriangleHitParser {
             normal: self.normal,
-            p1,
-            p2,
+            vertices: [p0, p1, p2],
             inv_proj_1,
             inv_proj_2,
             v1,

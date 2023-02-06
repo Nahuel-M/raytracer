@@ -15,6 +15,7 @@ impl Renderer {
         let start_time = std::time::Instant::now();
         world.pre_compute();
 
+        println!("Pre-compute done in in {:.2} seconds", start_time.elapsed().as_secs_f32());
         println!("Started rendering.");
         let half_width: f64 = image.width() as f64 / 2.;
         let half_height: f64 = image.height() as f64 / 2.;

@@ -10,11 +10,13 @@ mod bvh;
 use crate::{algebra::vec3::Vec3, hit::Hit, material::Material, ray::Ray};
 
 use self::{
-    camera::Camera, model::Model, triangle::Triangle, triangle_hit_parser::TriangleHitParser, vertex::Vertex,
+    camera::Camera, model::Model, triangle::Triangle, triangle_hit_parser::TriangleHitParser, vertex::Vertex, bvh::BoundedVolume,
 };
 
 
 pub struct VertexNormal(Vec3);
+
+#[allow(dead_code)]
 pub struct VertexColor(Vec3);
 
 pub struct World {
@@ -25,6 +27,7 @@ pub struct World {
     pub triangle_hit_parsers: Vec<TriangleHitParser>,
     pub materials: Vec<Arc<RwLock<Material>>>,
     pub vertex_normals: Vec<VertexNormal>,
+    pub bounded_volume_hierarchy: BoundedVolume,
     // pub models: Vec<Model>,
 }
 
@@ -38,6 +41,7 @@ impl<'a> World {
             triangle_hit_parsers: vec![],
             materials: vec![],
             vertex_normals: vec![],
+            bounded_volume_hierarchy: BoundedVolume::new(&vec![]),
             // models: vec![],
         }
     }
@@ -52,11 +56,13 @@ impl<'a> World {
     }
 
     pub fn get_ray_collision(&self, ray: &Ray) -> Option<Hit> {
-        let potential_distance = self
-            .triangle_hit_parsers
+        let potential_indices = self.bounded_volume_hierarchy.get_intersecting_indices(ray);
+        if potential_indices.is_empty(){
+            return None;
+        }
+        let potential_distance = potential_indices
             .iter()
-            .map(|triangle| triangle.get_hit_distance(ray))
-            .enumerate()
+            .map(|&index| (index, self.triangle_hit_parsers[index].get_hit_distance(ray)))
             .filter(|(_index, distance)| distance.is_some())
             .map(|(index, distance)| (index, distance.unwrap()))
             .reduce(|accumulator, (index, distance)| {
@@ -66,6 +72,20 @@ impl<'a> World {
                     accumulator
                 }
             });
+        // let potential_distance = self
+        //     .triangle_hit_parsers
+        //     .iter()
+        //     .map(|triangle| triangle.get_hit_distance(ray))
+        //     .enumerate()
+        //     .filter(|(_index, distance)| distance.is_some())
+        //     .map(|(index, distance)| (index, distance.unwrap()))
+        //     .reduce(|accumulator, (index, distance)| {
+        //         if distance < accumulator.1 {
+        //             (index, distance)
+        //         } else {
+        //             accumulator
+        //         }
+        //     });
         if let Some((index, distance)) = potential_distance {
             let triangle = &self.triangles[index];
             let mut normal = triangle.normal;
@@ -102,6 +122,8 @@ impl<'a> World {
             self.triangle_hit_parsers
                 .push(triangle.generate_hit_parser())
         }
+
+        self.bounded_volume_hierarchy = BoundedVolume::new(&self.triangle_hit_parsers);
     }
 }
 

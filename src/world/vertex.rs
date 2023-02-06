@@ -10,7 +10,7 @@ impl Vertex{
         Vertex(Arc::new(RwLock::new(Vec3::new(x, y, z))))
     }
     pub fn get(&self) -> Vec3{
-        self.0.read().unwrap().clone()
+        *self.0.read().unwrap()
     }
 
     pub fn get_mut(&self) -> RwLockWriteGuard<'_, Vec3 >{

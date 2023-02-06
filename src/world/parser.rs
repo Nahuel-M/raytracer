@@ -113,7 +113,7 @@ pub fn parse_ascii_obj(input: &str, world: &mut World) -> Model {
         let mut normal = Vec3::cross(
             &(vertices[1].get() - vertices[0].get()),
             &(vertices[2].get() - vertices[0].get()),
-        );
+        ).normalize();
         if normal.dot(&world.vertex_normals[vertex_normal_indexes[0]].0) < 0. {
             normal *= -1.;
         }

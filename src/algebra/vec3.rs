@@ -5,6 +5,8 @@ use std::{
 
 use image::Rgba;
 
+use super::axis::Axis;
+
 #[derive(Debug, Clone, Copy)]
 pub struct Vec3 {
     pub x: f64,
@@ -69,16 +71,36 @@ impl Vec3 {
     pub fn max(&self) -> f64{
         self.x.max(self.y).max(self.z)
     }
-    pub fn ew_min(&self, other: Vec3) -> Vec3{
+    /// Element-wise minimum for x, y, z
+    pub fn ew_min(&self, other: &Vec3) -> Vec3{
         Vec3::new(self.x.min(other.x), self.y.min(other.y), self.z.min(other.z))
     }
-    pub fn ew_max(&self, other: Vec3) -> Vec3{
+    /// Element-wise maximum for x, y, z
+    pub fn ew_max(&self, other: &Vec3) -> Vec3{
         Vec3::new(self.x.max(other.x), self.y.max(other.y), self.z.max(other.z))
     }
 
     pub fn clamp_to_rgba(&self) -> Rgba<u8>{
         Rgba([(self.x*255.).min(255.) as u8, (self.y*255.).min(255.) as u8, (self.z*255.).min(255.) as u8, 255_u8])
     }
+
+    pub fn axis(&self, axis: Axis) -> & f64{
+        match axis{
+            Axis::X => &self.x,
+            Axis::Y => &self.y,
+            Axis::Z => &self.z,
+        }
+    }
+
+    pub fn axis_mut(&mut self, axis: Axis) -> &mut f64{
+        match axis{
+            Axis::X => &mut self.x,
+            Axis::Y => &mut self.y,
+            Axis::Z => &mut self.z,
+        }
+    }
+    pub const MAX : Vec3 = Vec3::new(f64::MAX, f64::MAX, f64::MAX);
+    pub const MIN : Vec3 = Vec3::new(f64::MIN, f64::MIN, f64::MIN);
 }
 
 impl From<(f64, f64, f64)> for Vec3 {
@@ -250,5 +272,19 @@ impl Display for Vec3 {
 impl AddAssign<Vec3> for Vec<Vec3>{
     fn add_assign(&mut self, rhs: Vec3) {
         self.iter_mut().for_each(|vec3| *vec3 += rhs);
+    }
+}
+
+pub trait MinMaxVec3{
+    fn min_max(self) -> (Vec3, Vec3);
+}
+
+impl<'a, T: Iterator<Item = &'a Vec3>> MinMaxVec3 for T{
+    fn min_max(self) -> (Vec3, Vec3){
+        self.fold(
+            (Vec3::MAX, Vec3::MIN), 
+            |(min, max), new_vec| 
+            (new_vec.ew_min(&min), new_vec.ew_max(&max))
+        )
     }
 }
