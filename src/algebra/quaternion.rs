@@ -50,7 +50,7 @@ impl Quaternion {
 
 impl Display for Quaternion{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "[{}, {}, {}, {}]", self.real, self.i, self.j, self.k)
+        write!(f, "[{:.3}, {:.3}, {:.3}, {:.3}]", self.real, self.i, self.j, self.k)
     }
 }
 

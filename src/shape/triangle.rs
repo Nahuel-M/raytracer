@@ -4,8 +4,6 @@ use std::ops::{AddAssign, MulAssign};
 
 use crate::algebra::quaternion::Quaternion;
 use crate::hit::Hit;
-#[allow(unused)]
-use crate::iter_functions::AllEqual;
 
 use crate::Vec3;
 use crate::ray::Ray;

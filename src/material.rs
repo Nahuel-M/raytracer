@@ -25,7 +25,7 @@ impl Material {
 
     pub fn base_diffuse() -> Self {
         Material {
-            color: Vec3::new(1., 1., 1.),
+            color: Vec3::new(0.5, 0.5, 0.5),
             luminance: Vec3::new(0., 0., 0.),
             refraction: 0.,
             ior: 1.,

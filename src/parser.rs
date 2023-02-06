@@ -39,6 +39,8 @@ pub fn parse_ascii_stl(input: &str) -> Result<Mesh, String> {
     Ok(Mesh::new(polygons))
 }
 
+#[allow(dead_code)]
+
 
 #[allow(dead_code)]
 pub fn parse_ascii_stl_no_normals(input: &str) -> Result<Mesh, String> {
