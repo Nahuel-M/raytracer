@@ -7,7 +7,7 @@ pub mod triangle;
 mod triangle_hit_parser;
 mod bvh;
 
-use crate::{algebra::vec3::Vec3, hit::Hit, material::Material, ray::Ray};
+use crate::{algebra::vec3::Vec3, hit::Hit, material::{Material, map::RgbMap}, algebra::ray::Ray};
 
 use self::{
     camera::Camera, model::Model, triangle::Triangle, triangle_hit_parser::TriangleHitParser, vertex::Vertex, bvh::BoundedVolume,
@@ -21,7 +21,7 @@ pub struct VertexColor(Vec3);
 
 pub struct World {
     pub camera: Camera,
-    pub background: Vec3,
+    pub background: RgbMap,
     pub vertices: Vec<Vertex>,
     pub triangles: Vec<Triangle>,
     pub triangle_hit_parsers: Vec<TriangleHitParser>,
@@ -35,7 +35,7 @@ impl<'a> World {
     pub fn with_camera(camera: Camera) -> Self {
         World {
             camera,
-            background: Vec3::zeros(),
+            background: RgbMap::Color(Vec3::ZEROS),
             vertices: vec![],
             triangles: vec![],
             triangle_hit_parsers: vec![],
@@ -106,9 +106,6 @@ impl<'a> World {
                 distance,
                 position: ray.at(distance),
                 normal,
-                parallel_to_surface: (triangle.vertices[0].get()
-                    - triangle.vertices[1].get())
-                    .normalize(),
                 material: Some(triangle.material.clone()),
             });
         }

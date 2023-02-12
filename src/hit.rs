@@ -7,6 +7,5 @@ pub struct Hit {
     pub distance: f64,
     pub position: Vec3,
     pub normal: Vec3,
-    pub parallel_to_surface: Vec3,
     pub material: Option<Arc<RwLock<Material>>>,
 }

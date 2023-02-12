@@ -9,7 +9,7 @@ incremental = true
 
 
 [profile.release]
-debug = 0
+debug = true
 incremental = true
 
 
@@ -21,4 +21,3 @@ regex = "1.7.0"
 show-image = { version = "0.13.1", features = ["image", "save"]}
 rayon = "1.6.1"
 fastrand = "1.8.0"
-float-ord = "0.3.2"

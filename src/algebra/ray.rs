@@ -2,6 +2,8 @@ use std::f64::consts::PI;
 
 use crate::Vec3;
 
+use super::quaternion::Quaternion;
+
 #[derive(Debug, Clone, Copy)]
 pub struct Ray {
     pub origin: Vec3,
@@ -28,18 +30,27 @@ impl Ray {
     pub fn reflect_diffuse(
         &self,
         surface_normal: Vec3,
-        mut parallel_to_surface: Vec3,
         new_origin: Vec3,
     ) -> Self {
-        let random_angle = fastrand::f64() * 2. * PI;
-        parallel_to_surface =
-            Ray::rodrigues_rotation(parallel_to_surface, surface_normal, random_angle);
-        let random_angle = Ray::random_cosine_distribution();
-        let diffuse_direction =
-            Ray::rotate_towards_vector(surface_normal, parallel_to_surface, random_angle);
+        let random_u = fastrand::f64();
+        let random_v = fastrand::f64();
+
+        let radius = random_u.sqrt();
+        let theta = 2.0 * std::f64::consts::PI * random_v;
+
+        let mut random_cos_hemisphere = Vec3::new(
+            radius * theta.cos(),
+            radius * theta.sin(),
+            (1. - random_u).sqrt()
+        );
+
+        let align_with_normal = Quaternion::from_unit_vectors(Vec3::Z, surface_normal);
+
+        align_with_normal.rotate_vector(&mut random_cos_hemisphere);
+
         Ray {
             origin: new_origin,
-            direction_unit: diffuse_direction,
+            direction_unit: random_cos_hemisphere,
         }
     }
 
@@ -50,9 +61,11 @@ impl Ray {
         } else {
             surface_normal *= -1.;
         }
+
         let r_orthogonal = ior
             * (self.direction_unit + (-self.direction_unit.dot(&surface_normal) * surface_normal));
         let r_parallel = -f64::sqrt(1. - r_orthogonal.magnitude_squared()) * surface_normal;
+
         Ray {
             origin: new_origin,
             direction_unit: r_orthogonal + r_parallel,

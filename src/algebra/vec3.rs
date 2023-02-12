@@ -3,7 +3,7 @@ use std::{
     ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign}, iter::Sum,
 };
 
-use image::Rgba;
+use image::Rgb;
 
 use super::axis::Axis;
 
@@ -19,9 +19,6 @@ impl Vec3 {
         Vec3 { x, y, z }
     }
 
-    pub const fn zeros() -> Self{
-        Vec3::new(0., 0., 0.,)
-    }
     pub fn dot(&self, other: &Vec3) -> f64 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
@@ -56,15 +53,6 @@ impl Vec3 {
     pub fn sum(&self) -> f64 {
         self.x + self.y + self.z
     }
-    pub fn x() -> Vec3 {
-        Vec3 {x: 1., y: 0., z: 0. }
-    }
-    pub fn y() -> Vec3 {
-        Vec3 {x: 0., y: 1., z: 0. }
-    }
-    pub fn z() -> Vec3 {
-        Vec3 {x: 0., y: 0., z: 1. }
-    }
     pub fn min(&self) -> f64{
         self.x.min(self.y).min(self.z)
     }
@@ -80,8 +68,8 @@ impl Vec3 {
         Vec3::new(self.x.max(other.x), self.y.max(other.y), self.z.max(other.z))
     }
 
-    pub fn clamp_to_rgba(&self) -> Rgba<u8>{
-        Rgba([(self.x*255.).min(255.) as u8, (self.y*255.).min(255.) as u8, (self.z*255.).min(255.) as u8, 255_u8])
+    pub fn clamp_to_rgb(&self) -> Rgb<u8>{
+        Rgb([(self.x*255.).min(255.) as u8, (self.y*255.).min(255.) as u8, (self.z*255.).min(255.) as u8])
     }
 
     pub fn axis(&self, axis: Axis) -> & f64{
@@ -101,6 +89,10 @@ impl Vec3 {
     }
     pub const MAX : Vec3 = Vec3::new(f64::MAX, f64::MAX, f64::MAX);
     pub const MIN : Vec3 = Vec3::new(f64::MIN, f64::MIN, f64::MIN);
+    pub const X : Vec3 = Vec3 {x: 1., y: 0., z: 0. };
+    pub const Y : Vec3 = Vec3 {x: 0., y: 1., z: 0. };
+    pub const Z : Vec3 = Vec3 {x: 0., y: 0., z: 1. };
+    pub const ZEROS : Vec3 = Vec3 {x: 0., y: 0., z: 0. };
 }
 
 impl From<(f64, f64, f64)> for Vec3 {
@@ -109,6 +101,16 @@ impl From<(f64, f64, f64)> for Vec3 {
             x: value.0,
             y: value.1,
             z: value.2,
+        }
+    }
+}
+
+impl From<&Rgb<f32>> for Vec3 {
+    fn from(value: &Rgb<f32>) -> Self {
+        Vec3 {
+            x: value.0[0] as f64,
+            y: value.0[1] as f64,
+            z: value.0[2] as f64,
         }
     }
 }
@@ -259,7 +261,7 @@ impl Sum<Vec3> for Vec3{
 
 impl<'a> Sum<&'a Self> for Vec3{
     fn sum<I: Iterator<Item = &'a Self>>(iter: I) -> Self {
-        iter.fold(Vec3::zeros(),|acc, &vec3| acc + vec3)
+        iter.fold(Vec3::ZEROS,|acc, &vec3| acc + vec3)
     }
 }
 

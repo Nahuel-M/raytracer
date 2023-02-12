@@ -2,7 +2,7 @@ mod bounding_box;
 
 
 
-use crate::{algebra::{vec3::Vec3, axis::Axis}, ray::Ray};
+use crate::{algebra::{vec3::Vec3, axis::Axis}, algebra::ray::Ray};
 
 use self::bounding_box::BoundingBox;
 

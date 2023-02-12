@@ -1,4 +1,4 @@
-use crate::{algebra::vec3::Vec3, world::triangle_hit_parser::TriangleHitParser, ray::Ray};
+use crate::{algebra::vec3::Vec3, world::triangle_hit_parser::TriangleHitParser, algebra::ray::Ray};
 
 pub struct BoundingBox {
     pub minimums: Vec3,
@@ -8,7 +8,7 @@ pub struct BoundingBox {
 impl BoundingBox {
     pub fn new_from_vec3s(points: &[Vec3]) -> Self{
         if points.is_empty(){
-            return Self{minimums: Vec3::zeros(), maximums: Vec3::zeros()};
+            return Self{minimums: Vec3::ZEROS, maximums: Vec3::ZEROS};
         }
         let mut bounding_box = Self{ minimums: points[0], maximums: points[0] };
         for vec3 in points{
@@ -19,7 +19,7 @@ impl BoundingBox {
 
     pub fn new_from_vec3_indices(points: &[Vec3], indices: &[usize]) -> Self{
         if indices.is_empty() || points.is_empty(){
-            return Self{minimums: Vec3::zeros(), maximums: Vec3::zeros()};
+            return Self{minimums: Vec3::ZEROS, maximums: Vec3::ZEROS};
         }
         let mut bounding_box = Self{ minimums: points[indices[0]], maximums: points[indices[0]] };
         for index in indices{
@@ -30,7 +30,7 @@ impl BoundingBox {
  
     pub fn new_from_triangles(triangles: &[TriangleHitParser]) -> Self{
         if triangles.is_empty(){
-            return Self{minimums: Vec3::zeros(), maximums: Vec3::zeros()};
+            return Self{minimums: Vec3::ZEROS, maximums: Vec3::ZEROS};
         }
         let mut bounding_box = Self{ minimums: triangles[0].vertices[0], maximums: triangles[0].vertices[0] };
         for triangle in triangles{
@@ -41,7 +41,7 @@ impl BoundingBox {
 
     pub fn new_from_triangle_indices(triangles: &[TriangleHitParser], indices: &[usize]) -> Self{
         if indices.is_empty() || triangles.is_empty(){
-            return Self{minimums: Vec3::zeros(), maximums: Vec3::zeros()};
+            return Self{minimums: Vec3::ZEROS, maximums: Vec3::ZEROS};
         }
         let mut bounding_box = Self{ minimums: triangles[indices[0]].vertices[0], maximums: triangles[indices[0]].vertices[0] };
         for index in indices{

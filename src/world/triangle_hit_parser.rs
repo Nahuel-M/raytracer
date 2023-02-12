@@ -1,4 +1,4 @@
-use crate::{algebra::{vec3::Vec3, axis::Axis}, ray::Ray};
+use crate::{algebra::{vec3::Vec3, axis::Axis}, algebra::ray::Ray};
 
 
 pub struct TriangleHitParser {

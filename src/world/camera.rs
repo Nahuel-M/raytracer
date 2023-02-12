@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use crate::{
     algebra::{quaternion::Quaternion},
-    ray::Ray,
+    algebra::ray::Ray,
     Vec3,
 };
 #[derive(Debug)]
@@ -40,10 +40,10 @@ impl Camera {
         }
     }
     pub fn look_at(&mut self, position: Vec3) {
-        let up = Vec3::y();
+        let up = Vec3::Y;
         let direction = (position - self.position).normalize();
         let v = direction - up * up.dot(&direction);
-        let q = Quaternion::from_unit_vectors(Vec3::z(), v);
+        let q = Quaternion::from_unit_vectors(Vec3::Z, v);
         self.rotation_quaternion =
             Quaternion::from_unit_vectors(v, direction) * q;
     }
