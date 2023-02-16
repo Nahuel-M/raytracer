@@ -9,3 +9,13 @@ pub struct Hit {
     pub normal: Vec3,
     pub material: Option<Arc<RwLock<Material>>>,
 }
+
+pub struct Miss{
+    pub material: Option<Arc<RwLock<Material>>>,
+    pub uv : (f64, f64),
+}
+pub enum TraceResult{
+    Hit(Hit),
+    Miss(Miss),
+    DepthReached,
+}

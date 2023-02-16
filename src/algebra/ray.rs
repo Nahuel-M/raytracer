@@ -1,5 +1,3 @@
-use std::f64::consts::PI;
-
 use crate::Vec3;
 
 use super::quaternion::Quaternion;
