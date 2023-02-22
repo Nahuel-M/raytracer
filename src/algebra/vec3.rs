@@ -93,6 +93,7 @@ impl Vec3 {
     pub const Y : Vec3 = Vec3 {x: 0., y: 1., z: 0. };
     pub const Z : Vec3 = Vec3 {x: 0., y: 0., z: 1. };
     pub const ZEROS : Vec3 = Vec3 {x: 0., y: 0., z: 0. };
+    pub const ONES : Vec3 = Vec3 {x: 1., y: 1., z: 1. };
 }
 
 impl From<(f64, f64, f64)> for Vec3 {
@@ -288,5 +289,11 @@ impl<'a, T: Iterator<Item = &'a Vec3>> MinMaxVec3 for T{
             |(min, max), new_vec| 
             (new_vec.ew_min(&min), new_vec.ew_max(&max))
         )
+    }
+}
+
+impl Default for Vec3{
+    fn default() -> Self {
+        Vec3::ZEROS
     }
 }

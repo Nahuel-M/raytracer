@@ -3,21 +3,23 @@ use image::{ImageBuffer, Luma, Rgb};
 use crate::algebra::vec3::Vec3;
  
 #[allow(dead_code)]
+#[derive(Debug)]
 pub enum RgbMap{
     Color(Vec3),
-    Texture(Box<ImageBuffer<Rgb<f32>, Vec<f32>>>)
+    Texture(ImageBuffer<Rgb<f32>, Vec<f32>>)
 }
 #[allow(dead_code)]
+#[derive(Debug)]
 pub enum LumaMap{
     Value(f64),
-    Texture(Box<ImageBuffer<Luma<f32>, Vec<f32>>>)
+    Texture(ImageBuffer<Luma<f32>, Vec<f32>>)
 }
 
 pub trait GetValueAt<T>{
     fn get_value_at(&self, u: f64, v: f64) -> T;
 }
 
-impl GetValueAt<Vec3> for Box<ImageBuffer<Rgb<f32>, Vec<f32>>>{
+impl GetValueAt<Vec3> for ImageBuffer<Rgb<f32>, Vec<f32>>{
     fn get_value_at(&self, u: f64, v: f64) -> Vec3 {
         // Bilinear interpolation
         let u_2 = self.width() as f64 * u.min(0.99999);
@@ -38,5 +40,17 @@ impl GetValueAt<Vec3> for Box<ImageBuffer<Rgb<f32>, Vec<f32>>>{
         lh * v_factor * (1.-u_factor) + 
         hl * (1.-v_factor) * u_factor + 
         hh * u_factor * v_factor
+    }
+}
+
+impl From<Vec3> for RgbMap{
+    fn from(val: Vec3) -> Self {
+        RgbMap::Color(val)
+    }
+}
+
+impl From<f64> for LumaMap{
+    fn from(val: f64) -> Self {
+        LumaMap::Value(val)
     }
 }

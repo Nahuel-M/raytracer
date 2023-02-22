@@ -1,6 +1,5 @@
 use crate::{algebra::{vec3::Vec3, axis::Axis}, algebra::ray::Ray};
 
-
 pub struct TriangleHitParser {
     pub normal: Vec3,
 
@@ -11,9 +10,10 @@ pub struct TriangleHitParser {
 
     pub v1: Vec3, // Barycentric vector
     pub v2: Vec3,
-} // 7*3*8= 168 bytes
 
-impl TriangleHitParser {
+}
+
+impl TriangleHitParser{
     pub fn get_hit_distance(&self, ray: &Ray) -> Option<f64> {
         let predot = self.normal.dot(&ray.direction_unit);
         if (-0.01..0.01).contains(&predot){
@@ -62,4 +62,5 @@ impl TriangleHitParser {
             Axis::Z => self.vertices.iter().map(|vertex| vertex.z).sum::<f64>() / 3.0,
         }
     }
+
 }

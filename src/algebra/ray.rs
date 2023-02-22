@@ -69,24 +69,4 @@ impl Ray {
             direction_unit: r_orthogonal + r_parallel,
         }
     }
-
-    #[inline]
-    fn random_cosine_distribution() -> f64 {
-        f64::asin(fastrand::f64() * 2. - 1.)
-    }
-
-    #[inline]
-    fn rodrigues_rotation(vector: Vec3, axis_of_rotation: Vec3, angle_radians: f64) -> Vec3 {
-        vector * angle_radians.cos()
-            + axis_of_rotation.cross(&vector) * angle_radians.sin()
-            + axis_of_rotation * (axis_of_rotation.dot(&vector)) * (1. - angle_radians.cos())
-    }
-
-    #[inline]
-    fn rotate_towards_vector(vector: Vec3, target_vector: Vec3, angle_radians: f64) -> Vec3 {
-        let axis_of_rotation = vector.cross(&target_vector);
-        vector * angle_radians.cos()
-            + target_vector * angle_radians.sin()
-            + axis_of_rotation * (axis_of_rotation.dot(&vector)) * (1. - angle_radians.cos())
-    }
 }
