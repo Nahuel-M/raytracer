@@ -284,14 +284,6 @@ fn try_collect_triangles(indices: &[Option<usize>]) -> Vec<Option<[usize; 3]>>{
         .skip(1)
         .map(|window| Some([p1, window[0], window[1]]))
         .collect()
-
-    // if vec.len() == 3{
-    //     vec![vec.try_into().ok()]
-    // } else if vec.len() == 4{
-    //     vec![Some([vec[0], vec[1], vec[2]]), Some([vec[3], vec[2], vec[0]])]
-    // } else {
-    //     return vec![];
-    // }
 }
 
 fn fix_index_offsets_for_face(face: &mut Triangle, object_lowest_v : usize, object_lowest_uv : usize, object_lowest_normal : usize){
@@ -341,7 +333,7 @@ pub(crate) fn parse_mtl(input: &str, world: &mut World) -> Result<(), String> {
                 current_material.as_mut().unwrap().specular = f64_from_str(data)? / 1000.;
             },
             "Ka" => {
-
+                // Ambient is not used since GI replaces it
             },
             "Kd" => {
                 current_material.as_mut().unwrap().diffuse_color = vec3_from_str(data)?;
@@ -358,6 +350,9 @@ pub(crate) fn parse_mtl(input: &str, world: &mut World) -> Result<(), String> {
             "d" => {
                 current_material.as_mut().unwrap().refraction = 1. - f64_from_str(data)?;
             },
+            "Pr" | "map_Pr" => {
+                current_material.as_mut().unwrap().roughness = f64_from_str(data)?
+            }
             _ => {}
         }
     }

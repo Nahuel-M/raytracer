@@ -50,7 +50,7 @@ impl PreComputedWorld<'_>{
                 distance,
                 position: ray.at(distance),
                 normal,
-                material: Some(self.triangle_remaining_data[index].material),
+                material: self.triangle_remaining_data[index].material,
             });
         }
         None

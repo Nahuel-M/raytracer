@@ -49,6 +49,12 @@ impl From<Vec3> for RgbMap{
     }
 }
 
+impl From<image::ImageBuffer<image::Rgb<f32>, std::vec::Vec<f32>>> for RgbMap{
+    fn from(value: image::ImageBuffer<image::Rgb<f32>, std::vec::Vec<f32>>) -> Self {
+        RgbMap::Texture(value)
+    }
+}
+
 impl From<f64> for LumaMap{
     fn from(val: f64) -> Self {
         LumaMap::Value(val)
