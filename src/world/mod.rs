@@ -5,6 +5,8 @@ pub mod vertex;
 pub mod triangle;
 mod parser;
 
+use image::io::Reader;
+
 use crate::{algebra::vec3::Vec3, material::{map::RgbMap, Material}};
 
 use self::{
@@ -45,7 +47,7 @@ impl<'a> World {
         Ok("Success.".to_string())
     }
 
-    pub fn import_material_file(&'a mut self, filename: &str) -> Result<String, String> {
+    pub fn import_material_file(&'a mut self, filename: &str) -> Result<(), String> {
         let (_name, extension) = filename.split_once('.').unwrap_or(("", ""));
         let file_string = fs::read_to_string(filename).unwrap();
         match extension {
@@ -53,7 +55,14 @@ impl<'a> World {
             "mtl" => parser::parse_mtl(file_string.as_str(), self)?,
             _ => Err("Extension not supported")?,
         };
-        Ok("Success.".to_string())
+        Ok(())
+    }
+
+    pub fn import_skybox_file(&'a mut self, filename: &str) -> Result<(), String> {
+        self.background = Reader::open("D:\\Git\\Rust\\raytracer\\images\\above_clouds.jpg").map_err(|_| "Could not open file".to_string())?
+        .decode().unwrap().into_rgb32f().into();
+
+        Ok(())
     }
 }
 

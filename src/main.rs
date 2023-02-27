@@ -27,17 +27,9 @@ fn main() {
     let mut image = RgbImage::new(WIDTH, HEIGHT);
 
     let mut world = World::with_camera(camera);
-    world.import_3d_file("D:\\Git\\Rust\\raytracer\\models\\medieval_house.obj")
-        .unwrap();
-    world.import_material_file("models\\medieval_house.mtl")
-        .unwrap();
-
-    println!("{:?}", world.materials);
-    // println!("{:?}", world.models);
-    let clouds = Reader::open("D:\\Git\\Rust\\raytracer\\images\\above_clouds.jpg")
-        .unwrap().decode().unwrap().into_rgb32f();
-
-    world.background = RgbMap::Texture(clouds);
+    world.import_3d_file("models\\medieval_house.obj").unwrap();
+    world.import_material_file("models\\medieval_house.mtl").unwrap();
+    world.import_skybox_file("images\\above_clouds.jpg").unwrap();
 
     let mut renderer = Renderer::default();
 
@@ -49,7 +41,7 @@ fn main() {
     )
     .unwrap();
 
-    renderer.render(&world, &mut image, 1, 3);
+    renderer.render(&world, &mut image, 2, 3);
 
     window
         .set_image("render", image.as_image_view().unwrap())
