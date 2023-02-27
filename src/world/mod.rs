@@ -59,7 +59,7 @@ impl<'a> World {
     }
 
     pub fn import_skybox_file(&'a mut self, filename: &str) -> Result<(), String> {
-        self.background = Reader::open("D:\\Git\\Rust\\raytracer\\images\\above_clouds.jpg").map_err(|_| "Could not open file".to_string())?
+        self.background = Reader::open(filename).map_err(|_| "Could not open file".to_string())?
         .decode().unwrap().into_rgb32f().into();
 
         Ok(())

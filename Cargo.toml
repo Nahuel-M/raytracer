@@ -15,5 +15,4 @@ incremental = true
 image = "0.24.5"
 regex = "1.7.0"
 show-image = { version = "0.13.1", features = ["image", "save"]}
-rayon = "1.6.1"
 fastrand = "1.9.0"

@@ -1,15 +1,19 @@
 pub mod shader;
 pub mod tracer;
+mod ray_instancer;
+pub mod image_chunk;
+pub mod threading;
 
 use image::{ImageBuffer, Pixel, Rgb};
-use rayon::prelude::{IntoParallelIterator, ParallelIterator};
-
-use crate::{algebra::ray::Ray, algebra::vec3::Vec3, world::World};
-
+use crate::{world::World, renderer::{ray_instancer::RayInstancer}};
 use self::{
-    shader::{shade_package::ShadePackage, Shader},
-    tracer::Tracer
+    shader::Shader,
+    tracer::Tracer, image_chunk::ImageChunk
 };
+
+const CHUNK_WIDTH : usize = 8;
+type ImageChunk8 = ImageChunk<CHUNK_WIDTH>;
+
 #[derive(Default)]
 pub struct Renderer<'a> {
     tracer: Tracer<'a>,
@@ -27,84 +31,35 @@ impl<'a> Renderer<'a> {
         let start_time = std::time::Instant::now();
         self.tracer.pre_compute(world);
         self.shader.pre_compute(world);
+        let ray_instancer = RayInstancer::new(super_samples_sqrt, world.camera);
+
         println!(
             "Pre-compute done in in {:.3} seconds",
             start_time.elapsed().as_secs_f32()
         );
 
         println!("Started rendering.");
-        let half_width: f64 = image.width() as f64 / 2.;
-        let half_height: f64 = image.height() as f64 / 2.;
 
-        let pixels: Vec<_> = image.enumerate_pixels_mut().collect();
-
-        let super_pixels = Renderer::get_super_samples(super_samples_sqrt);
-        let camera = world.camera;
-        pixels.into_par_iter().for_each(|(x, y, pixel)| {
-            let mut average_pixel = Vec3::new(0., 0., 0.);
-
-            for super_pixel in &super_pixels {
-                let ray = camera.ray_for_pixel(
-                    x as f64 + super_pixel.0 - half_width,
-                    y as f64 + super_pixel.1 - half_height,
-                );
-
-                average_pixel +=
-                    Renderer::advance_ray(&ray, &self.tracer, &self.shader, max_bounces);
+        let num_x_chunks = image.width() as usize / CHUNK_WIDTH;
+        let num_y_chunks = image.height() as usize / CHUNK_WIDTH;
+        
+        for x_chunk in 0..num_x_chunks{
+            for y_chunk in 0..num_y_chunks{
+                let chunk = ImageChunk8{ top_left: (x_chunk*CHUNK_WIDTH, y_chunk*CHUNK_WIDTH).into() };
+                let chunk = threading::trace_chunk(chunk, &ray_instancer , &self.tracer, &self.shader);
+                for pixel in chunk.iter(){
+                    *image.get_pixel_mut(pixel.0.x as u32, pixel.0.y as u32) = pixel.1.clamp_to_rgb();
+                }
             }
-            average_pixel /= (super_samples_sqrt * super_samples_sqrt) as f64;
-
-            *pixel = average_pixel.clamp_to_rgb();
-        });
-
-        self.tracer.clear();
-        self.shader.clear();
+        }
 
         println!(
             "Rendering done in in {:.2} seconds",
             start_time.elapsed().as_secs_f32()
         );
-    }
 
-    fn advance_ray(ray: &Ray, tracer: &Tracer, shader: &Shader, remaining_bounces: u8) -> Vec3 {
-        if remaining_bounces == 0 {
-            return Vec3::new(0., 0., 0.);
-        }
+        self.tracer.clear();
+        self.shader.clear();
 
-        let trace_result = tracer.trace_ray(ray);
-        let shade_result = shader.shade_hit(&trace_result, ray);
-
-        shade_result
-        .iter()
-        .map(|shade_package| match shade_package{
-            ShadePackage::Ray(trace_package) => {
-                trace_package.multiplier *
-                Renderer::advance_ray(
-                    &trace_package.ray,
-                    tracer,
-                    shader,
-                    remaining_bounces - 1)
-            },
-            ShadePackage::Color(color) => *color,
-        })
-        .sum()
-       
-    }
-
-    fn get_super_samples(super_samples_sqrt: usize) -> Vec<(f64, f64)> {
-        let mut super_pixels: Vec<(f64, f64)> =
-            Vec::with_capacity(super_samples_sqrt * super_samples_sqrt);
-        for super_pixel_x in 0..super_samples_sqrt {
-            for super_pixel_y in 0..super_samples_sqrt {
-                let super_pixel = (
-                    (super_pixel_x as f64 - (super_samples_sqrt - 1) as f64 / 2.)
-                        / super_samples_sqrt as f64,
-                    (super_pixel_y as f64 - (super_samples_sqrt - 1) as f64 / 2.)
-                        / super_samples_sqrt as f64
-                );
-                super_pixels.push(super_pixel);
-            }
-        }
-        super_pixels
     }
 }
