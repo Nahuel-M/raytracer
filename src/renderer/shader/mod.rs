@@ -1,4 +1,6 @@
 pub mod shade_package;
+mod reflective_model;
+mod refractive_model;
 
 use std::f64::consts::PI;
 
@@ -10,11 +12,13 @@ use crate::{
     world::World,
 };
 
-use self::shade_package::ShadePackage;
+use self::{shade_package::ShadePackage, reflective_model::{DiffuseModel, SpecularModel, CookTorrance, SpecularDistributionFunction}, refractive_model::RefractiveModel};
 
 pub struct Shader<'a> {
-    reflective_model: ReflectiveModel,
+    diffuse_model: DiffuseModel,
+    specular_model: SpecularModel,
     refractive_model: RefractiveModel,
+    // ray_count : usize,
 
     scene_background: Option<&'a RgbMap>,
 }
@@ -22,11 +26,11 @@ pub struct Shader<'a> {
 impl<'a> Shader<'a> {
     pub fn pre_compute(&mut self, world: &'a World) {
         self.scene_background = Some(&world.background);
+        // self.ray_count = self.reflective_model.count() + self.refractive_model.count();
     }
-
     pub fn shade_hit(&self, trace_result: &TraceResult, ray : &Ray) -> Vec<ShadePackage> {
         match trace_result {
-            TraceResult::Hit(hit) => Shader::parse_hit(hit, ray).into(),
+            TraceResult::Hit(hit) => self.parse_hit(hit, ray),
             TraceResult::Miss => match self.scene_background.unwrap() {
                 RgbMap::Color(color) => vec![(*color).into()],
                 RgbMap::Texture(texture) => {
@@ -37,10 +41,9 @@ impl<'a> Shader<'a> {
             }
         }
     }
-
-    fn parse_hit(hit: &Hit, ray : &Ray) -> Vec<ShadePackage> {
+    fn parse_hit(&self, hit: &Hit, ray : &Ray) -> Vec<ShadePackage> {
         let mut packages : Vec<ShadePackage> = vec![];
-        let material = hit.material.unwrap();
+        let material = hit.material;
 
         let base_reflectance = (material.ior - 1.).powi(2) / (material.ior + 1.).powi(2);
         let fresnel_reflection = Shader::schlick_fresnell_approximation(
@@ -63,18 +66,12 @@ impl<'a> Shader<'a> {
 
             // Add specular
             if specular_factor > 0.0001 {
-                packages.push(TracePackage {
-                    ray: ray.reflect_specular(hit.normal, hit.position),
-                    multiplier: Vec3::new(specular_factor, specular_factor, specular_factor),
-                }.into())
+                self.specular_model.add_specular(hit, ray, &mut packages, specular_factor);
             }
 
             // Add diffuse
             if diffuse_factor > 0.0001 {
-                packages.push(TracePackage {
-                    ray: ray.reflect_diffuse(hit.normal, hit.position),
-                    multiplier: diffuse_factor * material.diffuse_color
-                }.into());
+                self.diffuse_model.add_diffuse(hit, ray, &mut packages, diffuse_factor * material.diffuse_color);
             }
         } else {
             // Continue ray as if nothing happened
@@ -85,15 +82,13 @@ impl<'a> Shader<'a> {
         }
 
         // Add refraction
-        if refraction_factor > 0.01 {
-            packages.push(TracePackage {
-                ray: ray.refract(hit.normal, hit.position, material.ior),
-                multiplier: Vec3::new(refraction_factor, refraction_factor, refraction_factor)
-            }.into());
+        if refraction_factor > 0.0001 {
+            self.refractive_model.add_refraction(hit, ray, &mut packages, refraction_factor);
         }
 
         packages
     }
+
 
     #[inline]
     /// See https://en.wikipedia.org/wiki/Schlick%27s_approximation
@@ -111,47 +106,15 @@ impl<'a> Shader<'a> {
     }
 }
 
-pub enum RefractiveModel {
-    None,
-    SchlickFresnell,
-}
 
-pub struct ReflectiveModel {
-    diffuse_model: DiffuseModel,
-    specular_model: SpecularModel,
-}
-
-pub enum SpecularModel {
-    None,
-    CookTorrance(CookTorrance),
-}
-
-pub struct CookTorrance {
-    distribution_function: SpecularDistributionFunction,
-    geometry_function: SpecularGeometryFunction,
-}
-
-pub enum SpecularGeometryFunction {
-    GGX,
-}
-
-pub enum SpecularDistributionFunction {
-    GGX,
-    Phong,
-}
-
-pub enum DiffuseModel {
-    None,
-    Lambertian,
-}
 
 impl Default for Shader<'_> {
     fn default() -> Self {
         Self {
-            reflective_model: ReflectiveModel {
-                diffuse_model: DiffuseModel::None,
-                specular_model: SpecularModel::None,
-            },
+            diffuse_model: DiffuseModel::Lambertian(2),
+            specular_model: SpecularModel::CookTorrance(
+                CookTorrance{ distribution_function: SpecularDistributionFunction::GGX, 
+                    geometry_function: reflective_model::SpecularGeometryFunction::GGX }),
             refractive_model: RefractiveModel::None,
             scene_background: Default::default(),
         }

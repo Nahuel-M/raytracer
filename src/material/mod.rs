@@ -37,7 +37,7 @@ impl Material {
             refraction: 0.,
             ior: 1.,
             specular: 0.,
-            roughness: 0.,
+            roughness: 0.5,
         }
     }
     pub fn as_light(luminance: Vec3) -> Self {
