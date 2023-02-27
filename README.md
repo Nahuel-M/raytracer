@@ -3,8 +3,10 @@ Basic raytracer written completely in Rust.
 To do:
 - [x] Make camera rotate with quaternion around stable axis (without roll)
 - [x] Increase efficiency of polygon hit calculation
-- [ ] Normals for vertices, interpolate normal for polygon
+- [x] Normals for vertices, interpolate normal for polygon
 - [x] Add precompute function for shape to speed up rendering
-- [ ] Add proper dielectric material
-- [ ] SIMD? Research and implementation
-- [ ] BVH
+- [x] Basic Bounded Volume Hierarchy
+- [ ] Improve BVH - https://jacco.ompf2.com/2022/04/13/how-to-build-a-bvh-part-1-basics/
+- [ ] SIMD for BVH? Research and implementation
+- [ ] Complete basic shader for Physically Based Rendering
+- [ ] Multiple Importance Sampling - http://shihchinw.github.io/2015/06/implementing-ggx-brdf-in-arnold-with-multiple-importance-sampling.html 
