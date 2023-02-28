@@ -13,3 +13,5 @@ To do:
 - [ ] Multiple Importance Sampling - http://shihchinw.github.io/2015/06/implementing-ggx-brdf-in-arnold-with-multiple-importance-sampling.html 
 - [ ] Consider definitive image and display pipeline
 - [ ] Lookup table from linear color space
+- [ ] Extend / rewrite world::parser to accept all .obj / .mtl files, and support textures for materials
+- [ ] Extend materials to allow for texture maps
