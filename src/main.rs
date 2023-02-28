@@ -21,8 +21,8 @@ const HEIGHT: u32 = 400;
 fn main() {
     let mut image = RgbImage::new(WIDTH, HEIGHT);
     let mut camera = Camera::new(PI / 4., &image);
-    camera.position = Vec3::new(10., 8., 10.);
-    camera.look_at(Vec3::new(0., 0., 0.));
+    camera.position = Vec3::new(10., 5., 10.);
+    camera.look_at(Vec3::new(0., 0.1, 0.));
 
     let mut world = World::with_camera(camera);
     world.import_3d_file("models\\medieval_house.obj").unwrap();

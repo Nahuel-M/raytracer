@@ -18,7 +18,9 @@ impl Vec3 {
     pub const fn new(x: f64, y: f64, z: f64) -> Self {
         Vec3 { x, y, z }
     }
-
+    pub const fn uniform(value: f64) -> Self {
+        Vec3{x: value, y: value, z: value}
+    }
     pub fn dot(&self, other: &Vec3) -> f64 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
@@ -67,7 +69,6 @@ impl Vec3 {
     pub fn ew_max(&self, other: &Vec3) -> Vec3{
         Vec3::new(self.x.max(other.x), self.y.max(other.y), self.z.max(other.z))
     }
-
     pub fn clamp_to_rgb(&self) -> Rgb<u8>{
         Rgb([(self.x*255.).min(255.) as u8, (self.y*255.).min(255.) as u8, (self.z*255.).min(255.) as u8])
     }

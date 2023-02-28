@@ -35,7 +35,7 @@ impl<'a> Shader<'a> {
                 RgbMap::Color(color) => vec![(*color).into()],
                 RgbMap::Texture(texture) => {
                     let u = 0.5 + f64::atan2(ray.direction_unit.z, ray.direction_unit.x) / (2. * PI);
-                    let v = 0.5 - f64::asin(ray.direction_unit.y.min(1.).max(-1.)) / PI;
+                    let v = 0.5 - f64::asin(ray.direction_unit.y.clamp(-1.0, 1.0)) / PI;
                     vec![texture.get_value_at(u, v).into()]
                 }
             }
