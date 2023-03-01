@@ -1,13 +1,13 @@
-use crate::{renderer::tracer::trace_package::TracePackage, algebra::vec3::Vec3};
+use crate::{renderer::tracer::trace_package::TracePackage, algebra::{vec3::Vec3, color::Color}};
 
 pub enum ShadePackage{
     Ray(TracePackage),
-    Color(Vec3)
+    Color(Color)
 }
 
 impl From<Vec3> for ShadePackage{
     fn from(val: Vec3) -> Self {
-        ShadePackage::Color(val)
+        ShadePackage::Color(val.into())
     }
 }
 

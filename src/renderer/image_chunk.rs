@@ -1,4 +1,4 @@
-use crate::algebra::vec3::Vec3;
+use crate::algebra::{vec3::Vec3, color::Color};
 
 use super::ray_instancer::pixel::Pixel;
 
@@ -21,14 +21,14 @@ impl<const SIZE: usize> ImageChunk<SIZE>{
 
 pub struct PixelColorArray<const SIZE: usize>{
     pub top_left : Pixel,
-    data : [[Vec3; SIZE]; SIZE],
+    data : [[Color; SIZE]; SIZE],
 }
 
 impl<const SIZE: usize> PixelColorArray<SIZE> {
     pub fn new(top_left: Pixel) -> Self{
-        Self{ top_left, data: [[Vec3::ZEROS; SIZE]; SIZE] }
+        Self{ top_left, data: [[Vec3::ZEROS.into(); SIZE]; SIZE] }
     }
-    pub fn set(&mut self, pixel: Pixel, color: Vec3){
+    pub fn set(&mut self, pixel: Pixel, color: Color){
         self.data[pixel.x - self.top_left.x][pixel.y - self.top_left.y] = color;
     }
 
@@ -36,7 +36,7 @@ impl<const SIZE: usize> PixelColorArray<SIZE> {
     //     self.data[pixel.x - self.top_left.x][pixel.y - self.top_left.y]
     // }
 
-    pub fn iter(&self) -> impl Iterator<Item = (Pixel, Vec3)> + '_{
+    pub fn iter(&self) -> impl Iterator<Item = (Pixel, Color)> + '_{
         self.data
             .iter()
             .enumerate()
@@ -49,23 +49,3 @@ impl<const SIZE: usize> PixelColorArray<SIZE> {
             })
     }
 }
-
-// impl <const SIZE: usize>IntoIterator for PixelColorArray<SIZE> {
-//     type Item = (Pixel, Vec3);
-//     type IntoIter = Box<dyn Iterator<Item = (Pixel, Vec3)>>;
-
-//     fn into_iter(self) -> Self::IntoIter {
-//         Box::new(
-//         self.data
-//             .into_iter()
-//             .enumerate()
-//             .flat_map(|(col_index, col_data)| {
-//                 col_data.into_iter()
-//                 .enumerate()
-//                 .map(move |(row_index, color)|{
-//                     (Pixel{x: col_index + self.top_left.x, y: row_index + self.top_left.y}, color)
-//                 })
-//             })
-//         )
-//     }
-// }

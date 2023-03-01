@@ -47,8 +47,8 @@ impl<'a> Renderer<'a> {
             for y_chunk in 0..num_y_chunks{
                 let chunk = ImageChunk8{ top_left: (x_chunk*CHUNK_WIDTH, y_chunk*CHUNK_WIDTH).into() };
                 let chunk = threading::trace_chunk(chunk, &ray_instancer , &self.tracer, &self.shader);
-                for pixel in chunk.iter(){
-                    *image.get_pixel_mut(pixel.0.x as u32, pixel.0.y as u32) = pixel.1.clamp_to_rgb();
+                for (position, color) in chunk.iter(){
+                    *image.get_pixel_mut(position.x as u32, position.y as u32) = color.to_srgb().clamp_to_rgb();
                 }
             }
         }

@@ -7,7 +7,7 @@ mod parser;
 
 use image::io::Reader;
 
-use crate::{algebra::vec3::Vec3, material::{map::RgbMap, Material}};
+use crate::{algebra::{vec3::Vec3, color::SpaceCast}, material::{map::RgbMap, Material}};
 
 use self::{
     camera::Camera, model::Model,
@@ -59,8 +59,13 @@ impl<'a> World {
     }
 
     pub fn import_skybox_file(&'a mut self, filename: &str) -> Result<(), String> {
-        self.background = Reader::open(filename).map_err(|_| "Could not open file".to_string())?
-        .decode().unwrap().into_rgb32f().into();
+        self.background = Reader::open(filename)
+            .map_err(|_| "Could not open file".to_string())?
+            .decode()
+            .unwrap()
+            .into_rgb32f()
+            .srgb_to_linear()
+            .into();
 
         Ok(())
     }
