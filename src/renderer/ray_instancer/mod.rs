@@ -1,7 +1,7 @@
-pub mod pixel;
+pub mod pixel_coordinate;
 
 use crate::{world::camera::Camera, algebra::ray::Ray};
-use self::pixel::Pixel;
+use self::pixel_coordinate::PixelCoordinate;
 
 pub struct RayInstancer{
     super_samples_width : usize,
@@ -10,7 +10,7 @@ pub struct RayInstancer{
 }
 
 impl RayInstancer{
-    pub fn rays_for_pixel(&self, pixel: Pixel) -> Vec<Ray> {
+    pub fn rays_for_pixel(&self, pixel: PixelCoordinate) -> Vec<Ray> {
         let mut rays = Vec::<Ray>::with_capacity(self.super_samples_width.pow(2));
         for super_sample in &self.super_samples{
             rays.push(

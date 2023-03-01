@@ -11,16 +11,16 @@ type PixelColorArray8 = PixelColorArray<CHUNK_WIDTH>;
 
 
 pub fn trace_chunk(chunk: ImageChunk8, ray_instancer: &RayInstancer, tracer : &Tracer, shader: &Shader) -> PixelColorArray8{
-    let mut res = PixelColorArray8::new(chunk.top_left);
+    let mut result = PixelColorArray8::new(chunk.top_left);
     for pixel in chunk.pixels(){
         let start_rays = ray_instancer.rays_for_pixel(pixel);
-        let mut accum_col = Color::BLACK;
+        let mut accumulated_color = Color::BLACK;
         for ray in &start_rays{
-            accum_col += process_ray(ray, tracer, shader, 4);
+            accumulated_color += process_ray(ray, tracer, shader, 4);
         }
-        res.set(pixel, accum_col / start_rays.len() as f64);
+        result.set(pixel, accumulated_color / start_rays.len() as f64);
     }
-    res
+    result
 }
 
 fn process_ray(ray: &Ray, tracer: &Tracer, shader: &Shader, remaining_bounces: u8) -> Color {
