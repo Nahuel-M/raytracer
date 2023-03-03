@@ -44,22 +44,6 @@ impl<'a> Tracer<'a> {
         println!("Finished precompute with {} faces", self.pre_computed_world.triangle_hit_parsers.len());
     }
 
-    fn remaining_data_from_triangle(world: &'a World, model: &Model, triangle: &Triangle) -> TriangleRemainingData<'a>{
-
-        let vertex_normals : [Vec3; 3] = 
-            if triangle.smoothing && triangle.vertex_normals.is_some(){
-                triangle.vertex_normals.unwrap().iter()
-                        .map(|&index| model.vertex_normals[index])
-                        .collect::<Vec<_>>()
-                        .try_into()
-                        .unwrap()
-            } else{
-                [triangle.normal; 3]
-            };
-
-        let material = world.materials.get(&model.material_name).unwrap();
-        TriangleRemainingData { vertex_normals, material }
-    }
 
     pub fn trace_ray(&self, ray: &Ray) -> TraceResult {
         let potential_hit = self.pre_computed_world.potential_hit(ray);
@@ -99,5 +83,22 @@ impl<'a> Tracer<'a> {
             v1,
             v2,
         }
+    }
+
+    fn remaining_data_from_triangle(world: &'a World, model: &Model, triangle: &Triangle) -> TriangleRemainingData<'a>{
+
+        let vertex_normals : [Vec3; 3] = 
+            if triangle.smoothing && triangle.vertex_normals.is_some(){
+                triangle.vertex_normals.unwrap().iter()
+                        .map(|&index| model.vertex_normals[index])
+                        .collect::<Vec<_>>()
+                        .try_into()
+                        .unwrap()
+            } else{
+                [triangle.normal; 3]
+            };
+
+        let material = world.materials.get(&model.material_name).unwrap();
+        TriangleRemainingData { vertex_normals, material }
     }
 }

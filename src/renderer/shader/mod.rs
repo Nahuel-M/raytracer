@@ -57,6 +57,12 @@ impl<'a> Shader<'a> {
         let refraction_factor = material.refraction * (1. - fresnel_reflection);
         let diffuse_factor = (1. - material.specular) * (1. - material.refraction);
 
+
+        // Add refraction
+        if refraction_factor > 0.0001 {
+            self.refractive_model.add_refraction(hit, ray, &mut packages, refraction_factor);
+        }
+
         let hitting_face_from_front = ray.direction_unit.dot(&hit.normal) < 0.;
         if hitting_face_from_front {
             // Add luminance
@@ -73,18 +79,8 @@ impl<'a> Shader<'a> {
             if diffuse_factor > 0.0001 {
                 self.diffuse_model.add_diffuse(hit, ray, &mut packages, diffuse_factor * material.diffuse_color);
             }
-        } else {
-            // Continue ray as if nothing happened
-            packages.push(TracePackage {
-                ray: Ray{origin: hit.position, ..*ray},
-                multiplier: Vec3::ONES
-            }.into());
-        }
+        } 
 
-        // Add refraction
-        if refraction_factor > 0.0001 {
-            self.refractive_model.add_refraction(hit, ray, &mut packages, refraction_factor);
-        }
 
         packages
     }
@@ -113,8 +109,8 @@ impl Default for Shader<'_> {
         Self {
             diffuse_model: DiffuseModel::Lambertian(2),
             specular_model: SpecularModel::CookTorrance(
-                CookTorrance{ distribution_function: SpecularDistributionFunction::GGX, 
-                    geometry_function: reflective_model::SpecularGeometryFunction::GGX }),
+                CookTorrance{ distribution_function: SpecularDistributionFunction::Ggx, 
+                    geometry_function: reflective_model::SpecularGeometryFunction::SchlickGGX }),
             refractive_model: RefractiveModel::None,
             scene_background: Default::default(),
         }

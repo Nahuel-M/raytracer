@@ -1,18 +1,15 @@
-use std::{iter, f64::consts::PI};
+use std::f64::consts::PI;
 
 use crate::{hit::Hit, algebra::{ray::Ray, vec3::Vec3, quaternion::Quaternion}, renderer::tracer::trace_package::TracePackage};
 
 use super::shade_package::ShadePackage;
-
+#[allow(dead_code)]
 pub enum SpecularModel {
     None,
     CookTorrance(CookTorrance),
 }
 impl SpecularModel {
-    fn count(&self) -> usize {
-        1
-    }
-    
+   
     #[inline]
     pub fn add_specular(&self, hit : &Hit, ray: &Ray, package_vec: &mut Vec<ShadePackage>, specular_factor: f64){
         match self{
@@ -30,31 +27,42 @@ pub struct CookTorrance {
 impl CookTorrance{
     #[inline]
     pub fn add_specular(&self, hit : &Hit, ray: &Ray, package_vec: &mut Vec<ShadePackage>, specular_factor: f64){
-        let normal = self.distribution_function.micro_facet_normal_sample(ray, hit);
+        let normal = self.distribution_function.micro_facet_normal_sample(hit.material.roughness, &hit.normal);
         package_vec.push(TracePackage {
             ray: ray.reflect_specular(normal, hit.position),
-            multiplier: Vec3::new(specular_factor, specular_factor, specular_factor),
+            multiplier: Vec3::uniform(specular_factor) * self.geometry_function.get_shading_factor(&hit.material.roughness, ray, &hit.normal),
         }.into());
     }
 }
 pub enum SpecularGeometryFunction {
-    GGX,
+    // See https://learnopengl.com/PBR/Theory
+    SchlickGGX,
 }
 
+impl SpecularGeometryFunction{
+    pub fn get_shading_factor(&self, roughness: &f64, ray: &Ray, surface_normal: &Vec3) -> f64{
+        let alpha = roughness * roughness / 2.;
+        let dot = -ray.direction_unit.dot(surface_normal);
+
+        dot / (dot * (1.-alpha) + alpha)
+    }
+}
+
+#[allow(dead_code)]
 pub enum SpecularDistributionFunction {
-    GGX,
+    Ggx,
     Phong,
 }
 // See https://www.cs.cornell.edu/~srm/publications/EGSR07-btdf.pdf
 impl SpecularDistributionFunction{
     #[inline]
-    fn micro_facet_normal_sample(&self, ray: &Ray, hit: &Hit) -> Vec3{
+    fn micro_facet_normal_sample(&self, roughness: f64, surface_normal : &Vec3) -> Vec3{
         match self{
-            SpecularDistributionFunction::GGX => {
+            SpecularDistributionFunction::Ggx => {
                 let random_u = fastrand::f64();
                 let random_v = fastrand::f64();
 
-                let parallel = 1. / ((hit.material.roughness*hit.material.roughness * random_u / (1.-random_u)) + 1. ).sqrt();
+                let parallel = 1. / ((roughness*roughness * random_u / (1.-random_u)) + 1. ).sqrt();
                 let flat_radius = (1. - parallel * parallel).sqrt();
                 let flat_angle = 2. * PI * random_v;
 
@@ -64,7 +72,7 @@ impl SpecularDistributionFunction{
                     parallel
                 );
 
-                let align_with_normal = Quaternion::from_unit_vectors(Vec3::Z, hit.normal);
+                let align_with_normal = Quaternion::from_unit_vectors(&Vec3::Z, surface_normal);
 
                 align_with_normal.rotate_vector(&mut random_cos_hemisphere);
 
@@ -76,18 +84,19 @@ impl SpecularDistributionFunction{
     }
 }
 
+#[allow(dead_code)]
 pub enum DiffuseModel {
     None,
     Lambertian(usize),
 }
 
 impl DiffuseModel{
-    pub fn count(&self) -> usize{
-        match self {
-            DiffuseModel::None => 0,
-            DiffuseModel::Lambertian(count) => *count,
-        }
-    }
+    // pub fn count(&self) -> usize{
+    //     match self {
+    //         DiffuseModel::None => 0,
+    //         DiffuseModel::Lambertian(count) => *count,
+    //     }
+    // }
     
     #[inline]
     pub fn add_diffuse(&self, hit : &Hit, ray: &Ray, package_vec: &mut Vec<ShadePackage>, diffuse_factor: Vec3){
@@ -104,19 +113,5 @@ impl DiffuseModel{
             },
         }
         
-    }
-    pub fn parse_hit<I>(&self, hit: &Hit, ray : &Ray, multiplier: &Vec3) -> Vec<ShadePackage>
-    {
-        match self{
-            DiffuseModel::None => vec![],
-            DiffuseModel::Lambertian(count) => {
-                iter::repeat_with(|| TracePackage {
-                    ray: ray.reflect_diffuse(hit.normal, hit.position),
-                    multiplier: *multiplier / *count as f64
-                }.into())
-                .take(*count)
-                .collect()
-            },
-        }
     }
 }

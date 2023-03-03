@@ -52,9 +52,9 @@ impl Camera {
         let up = Vec3::Y;
         let direction = (position - self.position).normalize();
         let v = direction - up * up.dot(&direction);
-        let q = Quaternion::from_unit_vectors(Vec3::Z, v);
+        let q = Quaternion::from_unit_vectors(&Vec3::Z, &v);
         self.rotation_quaternion =
-            Quaternion::from_unit_vectors(v, direction) * q;
+            Quaternion::from_unit_vectors(&v, &direction) * q;
     }
 }
 

@@ -42,7 +42,7 @@ impl Ray {
             (1. - random_u).sqrt()
         );
 
-        let align_with_normal = Quaternion::from_unit_vectors(Vec3::Z, surface_normal);
+        let align_with_normal = Quaternion::from_unit_vectors(&Vec3::Z,&surface_normal);
 
         align_with_normal.rotate_vector(&mut random_cos_hemisphere);
 
