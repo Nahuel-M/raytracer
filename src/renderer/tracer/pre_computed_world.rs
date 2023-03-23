@@ -39,13 +39,17 @@ impl PreComputedWorld<'_>{
             let (a, b) = &self.triangle_hit_parsers[index].get_barycentric_a_b(ray);
             let barycentrics = [1. - a - b, *a, *b, ];
 
-            let normal = self.triangle_remaining_data[index].vertex_normals
+            let mut normal = self.triangle_remaining_data[index].vertex_normals
                 .iter()
                 .zip(barycentrics.iter())
                 .map(|(&normal, &barycentric)| normal * barycentric)
                 .sum::<Vec3>()
                 .normalize();
            
+           if normal.dot(&self.triangle_hit_parsers[index].normal) < 0.{
+                normal = self.triangle_hit_parsers[index].normal;
+           }
+
             return Some(Hit {
                 distance,
                 position: ray.at(distance),
