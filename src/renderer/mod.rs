@@ -7,10 +7,9 @@ mod ray_instancer;
 use crossbeam_channel::{bounded};
 use image::{ImageBuffer, Pixel, Rgb};
 
-use std::thread;
-use std::thread::available_parallelism;
+use std::thread::{self, available_parallelism};
 
-use crate::{world::World, renderer::{ray_instancer::RayInstancer}};
+use crate::{world::World, renderer::ray_instancer::RayInstancer};
 use self::{
     shader::Shader,
     tracer::Tracer, image_chunk::ImageChunk
@@ -39,24 +38,26 @@ impl<'a> Renderer<'a> {
         let start_time = std::time::Instant::now();
 
         let number_of_cores = available_parallelism().unwrap().get();
-        println!("Started rendering. with {} virtual cores", number_of_cores    );
+        println!("Started rendering. with {}  cores.", number_of_cores);
 
         let (result_sender, result_receiver) = bounded(100);
         thread::scope(|s| {
             let (task_sender, task_receiver) = bounded(100);
 
+            // Spawn processing cores
             for _ in 0..number_of_cores - 1{
-                let task_receiver = task_receiver.clone();
-                let result_sender = result_sender.clone();
-                let ray_instancer = &self.ray_instancer;
-                let tracer = &self.tracer;
-                let shader = &self.shader;
-                s.spawn(move || {
+                s.spawn({
+                    let task_receiver = task_receiver.clone();
+                    let result_sender = result_sender.clone();
+                    let ray_instancer = &self.ray_instancer;
+                    let tracer = &self.tracer;
+                    let shader = &self.shader;
+                    move || {
                     while let Ok(chunk) = task_receiver.recv(){
                         let result = threading::trace_chunk(chunk, ray_instancer, tracer, shader, max_bounces);
-                        result_sender.send(result).unwrap();
+                        result_sender.to_owned().send(result).unwrap();
                     }
-                });
+                }});
             }
             
             drop(result_sender);
@@ -64,6 +65,7 @@ impl<'a> Renderer<'a> {
             let num_x_chunks = image.width() as usize / CHUNK_WIDTH;
             let num_y_chunks = image.height() as usize / CHUNK_WIDTH;
 
+            // Spawn result processor core
             s.spawn(|| {
                 while let Ok(result) = result_receiver.recv(){
                     for (coordinate, color) in result.iter(){
@@ -71,7 +73,8 @@ impl<'a> Renderer<'a> {
                     }
                 }
             });
-
+            
+            // Generate tasks
             for x_chunk in 0..num_x_chunks{
                 for y_chunk in 0..num_y_chunks{
                     let chunk = ImageChunk8{ top_left: (x_chunk*CHUNK_WIDTH, y_chunk*CHUNK_WIDTH).into() };
@@ -79,12 +82,6 @@ impl<'a> Renderer<'a> {
                 }
             }
         });
-
-        while let Ok(result) = result_receiver.recv(){
-            for (coordinate, color) in result.iter(){
-                *image.get_pixel_mut(coordinate.x as u32, coordinate.y as u32) = color.to_srgb().clamp_to_rgb();
-            }
-        }
 
         println!(
             "Rendering done in in {:.2} seconds",
