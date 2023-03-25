@@ -8,7 +8,6 @@ use crate::{
     algebra::{vec3::Vec3, ray::Ray},
     hit::{Hit, TraceResult},
     material::map::{GetValueAt, RgbMap},
-    renderer::tracer::trace_package::TracePackage,
     world::World,
 };
 

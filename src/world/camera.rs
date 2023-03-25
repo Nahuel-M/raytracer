@@ -7,7 +7,7 @@ use crate::{
     algebra::ray::Ray,
     Vec3,
 };
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct Camera {
     pub position: Vec3,
     pub rotation_quaternion: Quaternion,

@@ -2,7 +2,7 @@ pub mod pixel_coordinate;
 
 use crate::{world::camera::Camera, algebra::ray::Ray};
 use self::pixel_coordinate::PixelCoordinate;
-
+#[derive(Default)]
 pub struct RayInstancer{
     super_samples_width : usize,
     super_samples : Vec<(f64, f64)>,
@@ -20,10 +20,6 @@ impl RayInstancer{
         rays
     }
 
-    pub fn new(super_samples_width : usize, camera: Camera) -> Self{
-        Self{ super_samples_width, super_samples: Self::get_super_samples(super_samples_width), camera }
-    }
-
     fn get_super_samples(super_samples_width: usize) -> Vec<(f64, f64)> {
         let mut super_pixels: Vec<(f64, f64)> =
             Vec::with_capacity(super_samples_width * super_samples_width);
@@ -39,5 +35,11 @@ impl RayInstancer{
             }
         }
         super_pixels
+    }
+
+    pub(crate) fn pre_compute(&mut self, super_samples_sqrt: usize, camera: Camera) {
+        self.super_samples_width = super_samples_sqrt;
+        self.super_samples = Self::get_super_samples(super_samples_sqrt);
+        self.camera = camera;
     }
 }
