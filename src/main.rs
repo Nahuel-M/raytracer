@@ -3,9 +3,10 @@ mod hit;
 mod material;
 mod renderer;
 mod world;
+pub mod image;
 
 use show_image::{create_window, AsImageView, WindowOptions, event};
-use image::RgbImage;
+use ::image::RgbImage;
 use std::f64::consts::PI;
 
 use crate::algebra::vec3::Vec3;

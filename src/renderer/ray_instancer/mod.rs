@@ -1,7 +1,4 @@
-pub mod pixel_coordinate;
-
-use crate::{world::camera::Camera, algebra::ray::Ray};
-use self::pixel_coordinate::PixelCoordinate;
+use crate::{world::camera::Camera, algebra::ray::Ray, image::pixel_coordinate::PixelCoordinate};
 #[derive(Default)]
 pub struct RayInstancer{
     super_samples_width : usize,

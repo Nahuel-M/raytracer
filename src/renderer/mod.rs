@@ -1,22 +1,17 @@
-pub mod shader;
-pub mod tracer;
-pub mod image_chunk;
-pub mod threading;
 mod ray_instancer;
+pub mod shader;
+pub mod threading;
+pub mod tracer;
 
-use crossbeam_channel::{bounded};
+use crossbeam_channel::bounded;
 use image::{ImageBuffer, Pixel, Rgb};
 
 use std::thread::{self, available_parallelism};
 
-use crate::{world::World, renderer::ray_instancer::RayInstancer};
-use self::{
-    shader::Shader,
-    tracer::Tracer, image_chunk::ImageChunk
-};
+use self::{shader::Shader, tracer::Tracer};
+use crate::{renderer::ray_instancer::RayInstancer, world::World, image::get_chunks_iter};
 
-const CHUNK_WIDTH : usize = 8;
-type ImageChunk8 = ImageChunk<CHUNK_WIDTH>;
+const CHUNK_SIZE: usize = 32;
 
 #[derive(Default)]
 pub struct Renderer<'a> {
@@ -44,8 +39,8 @@ impl<'a> Renderer<'a> {
         thread::scope(|s| {
             let (task_sender, task_receiver) = bounded(100);
 
-            // Spawn processing cores
-            for _ in 0..number_of_cores - 1{
+            // Spawn processing threads
+            for _ in 0..number_of_cores - 1 {
                 s.spawn({
                     let task_receiver = task_receiver.clone();
                     let result_sender = result_sender.clone();
@@ -53,33 +48,37 @@ impl<'a> Renderer<'a> {
                     let tracer = &self.tracer;
                     let shader = &self.shader;
                     move || {
-                    while let Ok(chunk) = task_receiver.recv(){
-                        let result = threading::trace_chunk(chunk, ray_instancer, tracer, shader, max_bounces);
-                        result_sender.to_owned().send(result).unwrap();
+                        while let Ok(chunk) = task_receiver.recv() {
+                            let result = threading::trace_chunk(
+                                chunk,
+                                ray_instancer,
+                                tracer,
+                                shader,
+                                max_bounces,
+                            );
+                            result_sender.to_owned().send(result).unwrap();
+                        }
                     }
-                }});
+                });
             }
-            
+
             drop(result_sender);
 
-            let num_x_chunks = image.width() as usize / CHUNK_WIDTH;
-            let num_y_chunks = image.height() as usize / CHUNK_WIDTH;
+            let chunks = get_chunks_iter(image, CHUNK_SIZE);
 
-            // Spawn result processor core
+            // Spawn result processor thread
             s.spawn(|| {
-                while let Ok(result) = result_receiver.recv(){
-                    for (coordinate, color) in result.iter(){
-                        *image.get_pixel_mut(coordinate.x as u32, coordinate.y as u32) = color.to_srgb().clamp_to_rgb();
+                while let Ok(result) = result_receiver.recv() {
+                    for (coordinate, color) in result.iter() {
+                        *image.get_pixel_mut(coordinate.x as u32, coordinate.y as u32) =
+                            color.to_srgb().clamp_to_rgb();
                     }
                 }
             });
-            
-            // Generate tasks
-            for x_chunk in 0..num_x_chunks{
-                for y_chunk in 0..num_y_chunks{
-                    let chunk = ImageChunk8{ top_left: (x_chunk*CHUNK_WIDTH, y_chunk*CHUNK_WIDTH).into() };
-                    task_sender.send(chunk).unwrap();
-                }
+
+            // Generate chunks
+            for chunk in chunks{
+                task_sender.send(chunk).unwrap();
             }
         });
 
@@ -91,12 +90,13 @@ impl<'a> Renderer<'a> {
         self.clean_up();
     }
 
-    fn pre_compute(&mut self, world: &'a World, super_samples_sqrt: usize){
+    fn pre_compute(&mut self, world: &'a World, super_samples_sqrt: usize) {
         let start_time = std::time::Instant::now();
 
         self.tracer.pre_compute(world);
         self.shader.pre_compute(world);
-        self.ray_instancer.pre_compute(super_samples_sqrt, world.camera);
+        self.ray_instancer
+            .pre_compute(super_samples_sqrt, world.camera);
 
         println!(
             "Pre-compute done in in {:.3} seconds",
@@ -104,9 +104,7 @@ impl<'a> Renderer<'a> {
         );
     }
 
-
-
-    fn clean_up(&mut self){
+    fn clean_up(&mut self) {
         self.tracer.clear();
         self.shader.clear();
     }
