@@ -32,15 +32,9 @@ fn main() {
 
     let mut renderer = Renderer::default();
 
-    let window = create_window(
-        "image",
-        WindowOptions::new()
-            .set_size(Some([WIDTH, HEIGHT]))
-            .set_default_controls(true),
-    )
-    .unwrap();
+    let window = make_window();
 
-    renderer.render(&world, &mut image, 1, 4);
+    renderer.render(&world, &mut image, 5, 4);
 
     window
         .set_image("render", image.as_image_view().unwrap())
@@ -63,4 +57,14 @@ fn main() {
             }
         }
     }
+}
+
+fn make_window() -> show_image::WindowProxy{
+    create_window(
+        "image",
+        WindowOptions::new()
+            .set_size(Some([WIDTH, HEIGHT]))
+            .set_default_controls(true),
+    )
+    .unwrap()
 }

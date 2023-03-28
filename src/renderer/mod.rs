@@ -1,6 +1,6 @@
 mod ray_instancer;
 pub mod shader;
-pub mod threading;
+pub mod compute;
 pub mod tracer;
 
 use crossbeam_channel::bounded;
@@ -11,7 +11,7 @@ use std::thread::{self, available_parallelism};
 use self::{shader::Shader, tracer::Tracer};
 use crate::{renderer::ray_instancer::RayInstancer, world::World, image::get_chunks_iter};
 
-const CHUNK_SIZE: usize = 32;
+const CHUNK_SIZE: usize = 16;
 
 #[derive(Default)]
 pub struct Renderer<'a> {
@@ -39,17 +39,18 @@ impl<'a> Renderer<'a> {
         thread::scope(|s| {
             let (task_sender, task_receiver) = bounded(100);
 
+            let ray_instancer = &self.ray_instancer;
+            let tracer = &self.tracer;
+            let shader = &self.shader;
+            
             // Spawn processing threads
             for _ in 0..number_of_cores - 1 {
                 s.spawn({
                     let task_receiver = task_receiver.clone();
                     let result_sender = result_sender.clone();
-                    let ray_instancer = &self.ray_instancer;
-                    let tracer = &self.tracer;
-                    let shader = &self.shader;
                     move || {
                         while let Ok(chunk) = task_receiver.recv() {
-                            let result = threading::trace_chunk(
+                            let result = compute::trace_chunk(
                                 chunk,
                                 ray_instancer,
                                 tracer,

@@ -3,7 +3,6 @@ use crate::algebra::ray::Ray;
 use crate::image::image_chunk::{ImageChunkCoordinates, ImageChunk};
 use crate::renderer::ray_instancer::RayInstancer;
 use crate::renderer::Tracer;
-// use super::image_chunk::{ImageChunk, ImageChunkCoordinates};
 use super::shader::Shader;
 use super::shader::shade_package::ShadePackage;
 
