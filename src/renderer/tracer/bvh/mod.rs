@@ -7,7 +7,7 @@ use crate::{algebra::{vec3::Vec3, axis::Axis}, algebra::ray::Ray};
 use self::bounding_box::BoundingBox;
 
 use super::triangle_hit_parser::TriangleHitParser;
-
+#[derive(Default)]
 pub struct BoundedVolume {
     bounding_box : BoundingBox,
     children: BoundedVolumeChildren,
@@ -16,6 +16,12 @@ pub struct BoundedVolume {
 pub enum BoundedVolumeChildren {
     BoundedVolumes([Box<BoundedVolume>; 2]),
     TriangleIndices([Option<usize>; 2]),
+}
+
+impl Default for BoundedVolumeChildren{
+    fn default() -> Self {
+        BoundedVolumeChildren::TriangleIndices([None, None])
+    }
 }
 
 impl BoundedVolume {

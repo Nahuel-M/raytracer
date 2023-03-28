@@ -1,5 +1,5 @@
-use crate::{algebra::vec3::Vec3, world::triangle_hit_parser::TriangleHitParser, algebra::ray::Ray};
-
+use crate::{algebra::vec3::Vec3, algebra::ray::Ray, renderer::tracer::triangle_hit_parser::TriangleHitParser};
+#[derive(Default)]
 pub struct BoundingBox {
     pub minimums: Vec3,
     pub maximums: Vec3,

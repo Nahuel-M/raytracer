@@ -16,9 +16,9 @@ impl Quaternion {
     pub fn new() -> Self{
         Quaternion{real: 0., i: 0., j: 0., k: 0.}
     }
-    pub fn from_unit_vectors(from: Vec3, to: Vec3) -> Self {
-        let d = from.dot(&to);
-        let w = from.cross(&to);
+    pub fn from_unit_vectors(from: &Vec3, to: &Vec3) -> Self {
+        let d = from.dot(to);
+        let w = from.cross(to);
 
         Quaternion::from_vector(d + f64::sqrt(d * d + w.dot(&w)), w).normalize()
     }

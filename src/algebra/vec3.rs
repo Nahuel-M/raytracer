@@ -18,7 +18,9 @@ impl Vec3 {
     pub const fn new(x: f64, y: f64, z: f64) -> Self {
         Vec3 { x, y, z }
     }
-
+    pub const fn uniform(value: f64) -> Self {
+        Vec3{x: value, y: value, z: value}
+    }
     pub fn dot(&self, other: &Vec3) -> f64 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
@@ -67,7 +69,6 @@ impl Vec3 {
     pub fn ew_max(&self, other: &Vec3) -> Vec3{
         Vec3::new(self.x.max(other.x), self.y.max(other.y), self.z.max(other.z))
     }
-
     pub fn clamp_to_rgb(&self) -> Rgb<u8>{
         Rgb([(self.x*255.).min(255.) as u8, (self.y*255.).min(255.) as u8, (self.z*255.).min(255.) as u8])
     }
@@ -93,6 +94,7 @@ impl Vec3 {
     pub const Y : Vec3 = Vec3 {x: 0., y: 1., z: 0. };
     pub const Z : Vec3 = Vec3 {x: 0., y: 0., z: 1. };
     pub const ZEROS : Vec3 = Vec3 {x: 0., y: 0., z: 0. };
+    pub const ONES : Vec3 = Vec3 {x: 1., y: 1., z: 1. };
 }
 
 impl From<(f64, f64, f64)> for Vec3 {
@@ -288,5 +290,11 @@ impl<'a, T: Iterator<Item = &'a Vec3>> MinMaxVec3 for T{
             |(min, max), new_vec| 
             (new_vec.ew_min(&min), new_vec.ew_max(&max))
         )
+    }
+}
+
+impl Default for Vec3{
+    fn default() -> Self {
+        Vec3::ZEROS
     }
 }
