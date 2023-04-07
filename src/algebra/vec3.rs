@@ -227,6 +227,13 @@ impl Div<f64> for Vec3 {
     }
 }
 
+impl Div<Vec3> for f64 {
+    type Output = Vec3;
+    fn div(self, rhs: Vec3) -> Self::Output {
+        (self / rhs.x, self / rhs.y , self / rhs.z).into()
+    }
+}
+
 impl DivAssign<Vec3> for Vec3 {
     fn div_assign(&mut self, rhs: Vec3) {
         self.x /= rhs.x;

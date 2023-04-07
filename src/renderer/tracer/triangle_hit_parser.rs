@@ -1,6 +1,6 @@
-use crate::{algebra::{vec3::Vec3, axis::Axis}, algebra::ray::Ray};
-
-pub struct TriangleHitParser {
+use crate::{algebra::{vec3::Vec3, axis::Axis}, algebra::ray::Ray, material::Material};
+#[derive(Clone, Copy)]
+pub struct TriangleHitParser<'a> {
     pub normal: Vec3,
 
     pub vertices: [Vec3; 3],
@@ -11,9 +11,12 @@ pub struct TriangleHitParser {
     pub v1: Vec3, // Barycentric vector
     pub v2: Vec3,
 
+    pub vertex_normals: [Vec3; 3],
+    pub material: &'a  Material
+
 }
 
-impl TriangleHitParser{
+impl TriangleHitParser<'_>{
     pub fn get_hit_distance(&self, ray: &Ray) -> Option<f64> {
         let predot = self.normal.dot(&ray.direction_unit);
         if (-0.01..0.01).contains(&predot){
