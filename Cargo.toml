@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [profile.dev]
-debug = 2
+debug = true
 incremental = true
 
 [profile.release]
@@ -16,3 +16,4 @@ image = {version = "0.24.5", features = ["png", "jpeg"], default-features = fals
 show-image = { version = "0.13.1", features = ["image", "save"]}
 fastrand = "1.9.0"
 crossbeam-channel = "0.5.7"
+packed_simd_2 = "0.3.8"

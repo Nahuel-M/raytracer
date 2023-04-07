@@ -117,6 +117,12 @@ impl From<&Rgb<f32>> for Vec3 {
     }
 }
 
+impl From<Vec3> for packed_simd_2::f64x4{
+    fn from(value: Vec3) -> Self {
+        packed_simd_2::f64x4::new(value.x, value.y, value.z, 0.)
+    }
+}
+
 impl Add<Vec3> for Vec3 {
     type Output = Vec3;
     fn add(self, rhs: Vec3) -> Self::Output {
@@ -224,6 +230,13 @@ impl Div<f64> for Vec3 {
     type Output = Vec3;
     fn div(self, rhs: f64) -> Self::Output {
         (self.x / rhs, self.y / rhs, self.z / rhs).into()
+    }
+}
+
+impl Div<Vec3> for f64 {
+    type Output = Vec3;
+    fn div(self, rhs: Vec3) -> Self::Output {
+        (self / rhs.x, self / rhs.y , self / rhs.z).into()
     }
 }
 

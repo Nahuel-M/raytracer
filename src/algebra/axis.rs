@@ -1,4 +1,4 @@
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum Axis {
     X,
     Y,
@@ -12,4 +12,6 @@ impl Axis {
             Self::Z => Self::X,
         }
     }
+
+    pub const ALL : [Axis; 3] = [Axis::X, Axis::Y, Axis::Z];
 }
